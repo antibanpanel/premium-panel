@@ -161,11 +161,15 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
 
     <div class="admin-login" id="adminLogin">
       <div class="field">
+  <label for="adminEmail">Admin Email</label>
+  <input id="adminEmail" type="email" placeholder="Enter admin email">
+</div>
+      <div class="field">
         <label for="adminPassword">Admin Password</label>
         <input id="adminPassword" type="password" placeholder="Enter admin password">
       </div>
       <button class="btn btn-red" id="adminLoginBtn" style="width:100%;margin-top:12px">Admin Login</button>
-      <p class="note">Demo password: <b>admin123</b>. Change it in the JavaScript before publishing.</p>
+      <p class="note">Login with your Supabase admin account.</p>
     </div>
 
     <div class="admin-panel" id="adminPanel">
@@ -197,7 +201,6 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
 </main>
 
 <script>
-const ADMIN_PASSWORD = 'admin123';
 
 const $ = (id) => document.getElementById(id);
 const getOrders = () => {
@@ -212,9 +215,22 @@ function escapeHtml(value) {
   }[c]));
 }
 
-function renderOrders() {
-  const orders = getOrders();
-  $('adminStats').textContent = `${orders.length} order${orders.length === 1 ? '' : 's'}`;
+async function renderOrders() {
+  const { data: orders, error } = await supabaseClient
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    $('adminStats').textContent = 'Error loading orders';
+    $('ordersBody').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;color:#ff8f8f;padding:28px">Failed to load orders.</td></tr>';
+    return;
+  }
+
+  $('adminStats').textContent =
+    `${orders.length} order${orders.length === 1 ? '' : 's'}`;
 
   if (!orders.length) {
     $('ordersBody').innerHTML =
@@ -222,27 +238,52 @@ function renderOrders() {
     return;
   }
 
-  $('ordersBody').innerHTML = orders.map((o, i) => {
-    const status = o.status || 'PENDING';
-    const approved = status.startsWith('APPROVED');
-    const rejected = status === 'REJECTED';
+  $('ordersBody').innerHTML = orders.map(o => {
+    const status = o.order_status || 'Pending';
+    const approved = status === 'Approved';
+    const rejected = status === 'Rejected';
+
     let action = '';
+
     if (approved) {
       action = '<span class="small-btn" style="border-color:#426f4c;color:#7dff9a;cursor:default">Approved</span>';
     } else if (rejected) {
       action = '<span class="small-btn" style="border-color:#6f4242;color:#ff8f8f;cursor:default">Rejected</span>';
     } else {
-      action = `<div class="admin-actions"><button class="small-btn approve" onclick="approveOrder(${i})">Approve</button><button class="small-btn reject" onclick="rejectOrder(${i})">Reject</button></div>`;
+      action = `
+        <div class="admin-actions">
+          <button class="small-btn approve" onclick="approveOrder('${escapeHtml(o.order_id)}')">Approve</button>
+          <button class="small-btn reject" onclick="rejectOrder('${escapeHtml(o.order_id)}')">Reject</button>
+        </div>`;
     }
 
     return `
       <tr class="order-row">
-        <td><b>${escapeHtml(o.orderId || o.id || '-')}</b><br><span style="color:#9da2b2">${escapeHtml(o.createdAt || '')}</span></td>
-        <td>${escapeHtml(o.plan || o.package || '-')}<br><span style="color:#ffd600">${escapeHtml(o.amount || o.price || '')}</span></td>
-        <td>${escapeHtml(o.name || '-')}<br><span style="color:#9da2b2">${escapeHtml(o.contact || '')}</span><br>UID: ${escapeHtml(o.uid || '-')}</td>
-        <td>${escapeHtml(o.paymentMethod || o.payment || '-')}<br><span style="color:#9da2b2">${escapeHtml(o.payer || '')}</span></td>
-        <td>${escapeHtml(o.transactionId || o.txid || '-')}</td>
+        <td>
+          <b>${escapeHtml(o.order_id || '-')}</b><br>
+          <span style="color:#9da2b2">${escapeHtml(o.created_at || '')}</span>
+        </td>
+
+        <td>
+          ${escapeHtml(o.package_name || '-')}<br>
+          <span style="color:#ffd600">৳${escapeHtml(o.amount || '')}</span>
+        </td>
+
+        <td>
+          ${escapeHtml(o.customer_name || '-')}<br>
+          <span style="color:#9da2b2">${escapeHtml(o.contact || '')}</span><br>
+          UID: ${escapeHtml(o.game_uid || '-')}
+        </td>
+
+        <td>
+          ${escapeHtml(o.payment_method || '-')}<br>
+          <span style="color:#9da2b2">${escapeHtml(o.payer_number || '')}</span>
+        </td>
+
+        <td>${escapeHtml(o.transaction_id || '-')}</td>
+
         <td>${escapeHtml(status)}</td>
+
         <td>${action}</td>
       </tr>`;
   }).join('');
@@ -270,17 +311,27 @@ function rejectOrder(index) {
   alert('Order rejected.');
 }
 
-function loginAdmin() {
+async function loginAdmin() {
+  const email = $('adminEmail').value.trim();
   const password = $('adminPassword').value;
-  if (password !== ADMIN_PASSWORD) {
-    alert('Wrong admin password.');
-    $('adminPassword').focus();
+
+  if (!email || !password) {
+    alert('Please enter email and password.');
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert('Login failed: ' + error.message);
     return;
   }
 
   $('adminLogin').style.display = 'none';
   $('adminPanel').style.display = 'block';
-  sessionStorage.setItem('ffp_admin_logged_in', '1');
   renderOrders();
 }
 
@@ -292,17 +343,12 @@ function logoutAdmin() {
 }
 
 $('adminLoginBtn').addEventListener('click', loginAdmin);
-$('adminPassword').addEventListener('keydown', e => {
-  if (e.key === 'Enter') loginAdmin();
-});
+
+
 $('refreshOrders').addEventListener('click', renderOrders);
 $('logoutAdmin').addEventListener('click', logoutAdmin);
 
-if (sessionStorage.getItem('ffp_admin_logged_in') === '1') {
-  $('adminLogin').style.display = 'none';
-  $('adminPanel').style.display = 'block';
-  renderOrders();
-}
+
 window.addEventListener('storage', (e) => {
   if (e.key === 'ffp_orders') renderOrders();
 });
