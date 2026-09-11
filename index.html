@@ -414,7 +414,15 @@ const prices={
   '6 Month — ৳599':'৳599',
   'Lifetime Premium — ৳999':'৳999'
 };
-
+  
+const amounts={
+  '1 Month — ৳99':99,
+  '1 Month Premium — ৳199':199,
+  '2 Month Premium — ৳299':299,
+  '6 Month — ৳599':599,
+  'Lifetime Premium — ৳999':999
+};
+  
 let currentOrder=null;
 let selectedMethod='';
 
@@ -478,19 +486,52 @@ copyPayment.addEventListener('click', async ()=>{
   }catch(e){ alert('Please copy the payment address manually.'); }
 });
 
-verifyBtn.addEventListener('click',()=>{
+verifyBtn.addEventListener('click', async ()=>{
   if(!currentOrder) return;
+
   const txn=document.getElementById('transactionId').value.trim();
   const payer=document.getElementById('payer').value.trim();
 
-  if(!selectedMethod){ alert('Please select a payment method.'); return; }
-  if(!txn){ alert('Please enter the transaction/reference ID.'); return; }
+  if(!selectedMethod){
+    alert('Please select a payment method.');
+    return;
+  }
+
+  if(!txn){
+    alert('Please enter the transaction/reference ID.');
+    return;
+  }
 
   currentOrder.paymentMethod=selectedMethod;
   currentOrder.transactionId=txn;
   currentOrder.payer=payer;
   currentOrder.status='PAYMENT SUBMITTED — PENDING ADMIN APPROVAL';
 
+  // Save order to Supabase
+  const { error } = await supabaseClient
+    .from('orders')
+    .insert([{
+      order_id: currentOrder.orderId,
+      package_name: currentOrder.plan,
+      amount: amounts[currentOrder.plan] || 0,
+      customer_name: currentOrder.name,
+      contact: currentOrder.contact,
+      game_uid: currentOrder.uid || null,
+      additional_note: currentOrder.note || null,
+      payment_method: currentOrder.paymentMethod,
+      transaction_id: currentOrder.transactionId,
+      payer_number: currentOrder.payer || null,
+      payment_status: 'Pending',
+      order_status: 'Pending'
+    }]);
+
+  if(error){
+    console.error(error);
+    alert('Order submit failed: ' + error.message);
+    return;
+  }
+
+  // Keep local copy for now
   const orders=getOrders();
   orders.unshift(currentOrder);
   saveOrders(orders);
@@ -500,12 +541,16 @@ verifyBtn.addEventListener('click',()=>{
 
   // Show the 5-minute verification waiting screen.
   waitingBox.style.display='block';
+
   let remaining = 300;
   waitingTimer.textContent='05:00';
+
   if(window.waitingInterval) clearInterval(window.waitingInterval);
+
   window.waitingInterval=setInterval(()=>{
     checkApproval();
     remaining--;
+
     if(remaining <= 0){
       clearInterval(window.waitingInterval);
       waitingTimer.textContent='Verification time completed';
@@ -515,7 +560,11 @@ verifyBtn.addEventListener('click',()=>{
       waitingTimer.textContent=mm+':'+ss;
     }
   },1000);
-  waitingBox.scrollIntoView({behavior:'smooth',block:'center'});
+
+  waitingBox.scrollIntoView({
+    behavior:'smooth',
+    block:'center'
+  });
 });
 
 /* ---------------- CUSTOMER DELIVERY STATUS ---------------- */
