@@ -363,12 +363,20 @@ async function logoutAdmin() {
 }
 
 async function restoreAdminSession() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
+  const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+  console.log('RESTORE SESSION:', session);
+  console.log('SESSION ERROR:', error);
 
   if (session) {
+    console.log('SESSION FOUND — OPENING ADMIN PANEL');
+
     $('adminLogin').style.display = 'none';
     $('adminPanel').style.display = 'block';
+
     await renderOrders();
+  } else {
+    console.log('NO SESSION — LOGIN PAGE');
   }
 }
 
