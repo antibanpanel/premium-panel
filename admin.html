@@ -351,10 +351,12 @@ async function loginAdmin() {
   renderOrders();
 }
 
-function logoutAdmin() {
-  sessionStorage.removeItem('ffp_admin_logged_in');
+async function logoutAdmin() {
+  await supabaseClient.auth.signOut();
+
   $('adminPanel').style.display = 'none';
   $('adminLogin').style.display = 'block';
+  $('adminEmail').value = '';
   $('adminPassword').value = '';
 }
 
