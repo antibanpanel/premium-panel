@@ -584,19 +584,37 @@ function showApprovedDownload(order){
   verifyStatus.innerHTML='<span class="status" style="border-color:#426f4c;color:#7dff9a">APPROVED ✓ — ZIP FILE IS READY</span>';
 }
 
-function checkApproval(){
+async function checkApproval(){
   if(!currentOrder) return;
-  const orders=getOrders();
-  const saved=orders.find(o => o.orderId===currentOrder.orderId);
-  if(!saved) return;
-  currentOrder=saved;
-  if((saved.status||'').startsWith('APPROVED')) showApprovedDownload(saved);
-  else if(saved.status==='REJECTED'){
+
+  const { data, error } = await supabaseClient
+    .rpc('get_order_status', {
+      p_order_id: currentOrder.orderId
+    });
+
+  if(error){
+    console.error('Approval check failed:', error);
+    return;
+  }
+
+  if(!data || !data.length) return;
+
+  const saved = data[0];
+
+  if(saved.order_status === 'Approved'){
+    currentOrder.status = 'APPROVED — READY FOR DELIVERY';
+    showApprovedDownload(currentOrder);
+
+  } else if(saved.order_status === 'Rejected'){
+    currentOrder.status = 'REJECTED';
+
     if(waitingBox) waitingBox.style.display='none';
     if(window.waitingInterval) clearInterval(window.waitingInterval);
+
     downloadBox.classList.remove('show');
     verifyStatus.style.display='block';
-    verifyStatus.innerHTML='<span class="status" style="border-color:#6f4242;color:#ff8f8f">REJECTED — PLEASE CONTACT SUPPORT</span>';
+    verifyStatus.innerHTML =
+      '<span class="status" style="border-color:#6f4242;color:#ff8f8f">REJECTED — PLEASE CONTACT SUPPORT</span>';
   }
 }
 
