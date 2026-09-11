@@ -585,6 +585,7 @@ function showApprovedDownload(order){
 }
 
 async function checkApproval(){
+  console.log('CHECK APPROVAL RUNNING', currentOrder);
   if(!currentOrder) return;
 
   const { data, error } = await supabaseClient
