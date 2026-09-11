@@ -355,6 +355,16 @@ async function logoutAdmin() {
   $('adminPassword').value = '';
 }
 
+async function restoreAdminSession() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (session) {
+    $('adminLogin').style.display = 'none';
+    $('adminPanel').style.display = 'block';
+    await renderOrders();
+  }
+}
+
 $('adminLoginBtn').addEventListener('click', loginAdmin);
 
 
@@ -378,6 +388,7 @@ $('logoutAdmin').addEventListener('click', () => {
 window.addEventListener('storage', renderOrders);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) renderOrders(); });
 setInterval(renderOrders, 1500);
+  restoreAdminSession();
 </script>
 </body>
 </html>
