@@ -138,6 +138,12 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
 .small-btn.reject{border-color:#6f4242}
 .admin-head{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
 .admin-stat{color:var(--muted);font-size:13px}
+  .verify-box{
+  display:none;
+}
+.verify-box.show{
+  display:block;
+}
 </style>
 </head>
 <body>
@@ -406,7 +412,7 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
 </footer>
 
 <script>
-const buttons=document.querySelectorAll('.order-btn');
+const buttons=.querySelectorAll('.order-btn');
 const planSelect=document.getElementById('plan');
 const form=document.getElementById('orderForm');
 const paymentBox=document.getElementById('paymentBox');
@@ -492,11 +498,17 @@ form.addEventListener('submit', e=>{
 document.querySelectorAll('.pay-method').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.pay-method').forEach(x=>x.classList.remove('active'));
+
     btn.classList.add('active');
+
     selectedMethod=btn.dataset.method;
+
     paymentTitle.textContent=selectedMethod+' payment account';
     paymentNumber.textContent=paymentAccounts[selectedMethod];
+
     paymentInfo.classList.add('show');
+
+    document.querySelector('.verify-box').classList.add('show');
   });
 });
 
