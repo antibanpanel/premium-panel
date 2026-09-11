@@ -308,14 +308,22 @@ async function approveOrder(orderId) {
   alert('Order approved. Customer can now continue.');
 }
 
-function rejectOrder(index) {
-  const orders = getOrders();
-  if (!orders[index]) return;
+async function rejectOrder(orderId) {
+  const { error } = await supabaseClient
+    .from('orders')
+    .update({
+      order_status: 'Rejected',
+      payment_status: 'Rejected'
+    })
+    .eq('order_id', orderId);
 
-  orders[index].status = 'REJECTED';
-  orders[index].rejectedAt = new Date().toISOString();
-  saveOrders(orders);
-  renderOrders();
+  if (error) {
+    console.error(error);
+    alert('Reject failed: ' + error.message);
+    return;
+  }
+
+  await renderOrders();
   alert('Order rejected.');
 }
 
