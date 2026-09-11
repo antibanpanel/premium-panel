@@ -289,15 +289,23 @@ async function renderOrders() {
   }).join('');
 }
 
-function approveOrder(index) {
-  const orders = getOrders();
-  if (!orders[index]) return;
+async function approveOrder(orderId) {
+  const { error } = await supabaseClient
+    .from('orders')
+    .update({
+      order_status: 'Approved',
+      payment_status: 'Approved'
+    })
+    .eq('order_id', orderId);
 
-  orders[index].status = 'APPROVED — READY FOR DELIVERY';
-  orders[index].approvedAt = new Date().toLocaleString();
-  saveOrders(orders);
-  renderOrders();
-  alert('Order approved. Customer main page will now show the ZIP download.');
+  if (error) {
+    console.error(error);
+    alert('Approve failed: ' + error.message);
+    return;
+  }
+
+  await renderOrders();
+  alert('Order approved. Customer can now continue.');
 }
 
 function rejectOrder(index) {
