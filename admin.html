@@ -1,48 +1,40 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Free Fire Panel — Admin</title>
+<title>Admin Panel - Free Fire Panel Store</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root{
-  --bg:#07080d;
-  --card:#11131b;
-  --card2:#151824;
-  --red:#ff1744;
-  --yellow:#ffd600;
-  --green:#20df70;
-  --blue:#3d8bfd;
-  --white:#fff;
-  --muted:#9da3b4;
-  --border:rgba(255,255,255,.08);
-}
-
 *{
+  box-sizing:border-box;
   margin:0;
   padding:0;
-  box-sizing:border-box;
 }
 
 body{
   font-family:Arial,Helvetica,sans-serif;
   background:
-    radial-gradient(circle at top left,rgba(255,23,68,.10),transparent 35%),
-    radial-gradient(circle at top right,rgba(255,214,0,.07),transparent 30%),
-    var(--bg);
-  color:var(--white);
+    radial-gradient(circle at top,#320d05 0%,#0d0806 38%,#050505 80%);
+  color:#fff;
   min-height:100vh;
 }
 
-button,input{
-  font:inherit;
+button,input,select{
+  font-family:inherit;
 }
 
-/* LOGIN */
+.hidden{
+  display:none!important;
+}
 
-.login-screen{
+/* ================= LOGIN ================= */
+
+#loginScreen{
   min-height:100vh;
   display:flex;
   align-items:center;
@@ -50,268 +42,200 @@ button,input{
   padding:20px;
 }
 
-.login-box{
-  width:100%;
-  max-width:420px;
-  background:rgba(17,19,27,.96);
-  border:1px solid var(--border);
-  border-radius:24px;
+.login-card{
+  width:min(420px,94%);
+  background:#111;
+  border:1px solid rgba(255,75,0,.25);
+  border-radius:22px;
   padding:35px;
-  box-shadow:0 25px 80px rgba(0,0,0,.55);
+  box-shadow:0 25px 90px rgba(0,0,0,.7);
 }
 
 .logo{
   text-align:center;
+  font-size:26px;
+  font-weight:900;
+  color:#ff4b00;
+}
+
+.login-sub{
+  text-align:center;
+  color:#777;
+  font-size:13px;
+  margin-top:7px;
   margin-bottom:28px;
 }
 
-.logo-icon{
-  width:65px;
-  height:65px;
-  margin:auto;
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,var(--red),#8b001d);
-  font-size:28px;
-  box-shadow:0 0 35px rgba(255,23,68,.25);
-}
-
-.logo h1{
-  margin-top:15px;
-  font-size:24px;
-}
-
-.logo p{
-  color:var(--muted);
-  margin-top:7px;
-  font-size:13px;
-}
-
-.input-group{
-  margin-bottom:18px;
-}
-
-.input-group label{
+label{
   display:block;
-  color:#ddd;
+  color:#aaa;
   font-size:13px;
-  margin-bottom:8px;
+  margin:15px 0 7px;
 }
 
-.input-group input{
+input,select{
   width:100%;
-  background:#0b0d13;
-  border:1px solid var(--border);
-  color:white;
   padding:14px;
-  border-radius:12px;
+  background:#090909;
+  color:#fff;
+  border:1px solid #292929;
+  border-radius:10px;
   outline:none;
 }
 
-.input-group input:focus{
-  border-color:var(--red);
+input:focus,
+select:focus{
+  border-color:#ff4b00;
 }
 
 .login-btn{
   width:100%;
+  margin-top:22px;
+  padding:15px;
   border:0;
-  padding:14px;
-  border-radius:12px;
-  background:linear-gradient(135deg,var(--red),#c4002d);
-  color:white;
-  font-weight:bold;
+  border-radius:11px;
+  background:linear-gradient(90deg,#ff2600,#ff7200);
+  color:#fff;
+  font-weight:800;
+  font-size:15px;
   cursor:pointer;
 }
 
-.login-error{
-  color:#ff6b86;
-  font-size:13px;
-  text-align:center;
-  margin-top:12px;
+.login-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
-/* ADMIN */
-
-.admin{
+.login-error{
   display:none;
+  margin-top:14px;
+  padding:11px;
+  border-radius:9px;
+  background:#300d0d;
+  border:1px solid #792323;
+  color:#ff7777;
+  text-align:center;
+  font-size:13px;
+}
+
+
+/* ================= ADMIN ================= */
+
+#adminPanel{
+  min-height:100vh;
 }
 
 .topbar{
-  position:sticky;
-  top:0;
-  z-index:100;
-  background:rgba(7,8,13,.92);
-  backdrop-filter:blur(15px);
-  border-bottom:1px solid var(--border);
-  padding:16px 25px;
-}
+  padding:18px 5%;
+  background:rgba(0,0,0,.45);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(12px);
 
-.topbar-inner{
-  max-width:1400px;
-  margin:auto;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:15px;
 }
 
 .brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.brand-icon{
-  width:42px;
-  height:42px;
-  border-radius:12px;
-  background:linear-gradient(135deg,var(--red),#9d0024);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.brand h2{
-  font-size:18px;
+  color:#ff4b00;
+  font-size:22px;
+  font-weight:900;
 }
 
 .brand span{
   display:block;
+  color:#777;
   font-size:11px;
-  color:var(--muted);
-  margin-top:3px;
+  font-weight:400;
+  margin-top:4px;
 }
 
-.logout{
-  background:#191b24;
-  color:white;
-  border:1px solid var(--border);
+.user-area{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.user-email{
+  color:#888;
+  font-size:12px;
+}
+
+.logout-btn{
+  border:1px solid #333;
+  background:#151515;
+  color:#fff;
   padding:10px 15px;
-  border-radius:10px;
+  border-radius:9px;
   cursor:pointer;
+  font-weight:700;
+}
+
+.logout-btn:hover{
+  border-color:#ff4b00;
 }
 
 .container{
-  max-width:1400px;
-  margin:auto;
-  padding:30px 20px 60px;
+  width:min(1400px,94%);
+  margin:30px auto;
 }
 
-.page-title{
-  margin-bottom:25px;
-}
 
-.page-title h1{
-  font-size:30px;
-}
-
-.page-title p{
-  color:var(--muted);
-  margin-top:6px;
-}
-
-/* STATS */
+/* ================= STATS ================= */
 
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:16px;
+  gap:15px;
   margin-bottom:25px;
 }
 
 .stat{
-  background:linear-gradient(145deg,var(--card),var(--card2));
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:22px;
+  background:#111;
+  border:1px solid #242424;
+  border-radius:16px;
+  padding:20px;
 }
 
-.stat-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.stat small{
+  display:block;
+  color:#777;
+  margin-bottom:8px;
 }
 
-.stat-icon{
-  width:42px;
-  height:42px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#1a1c26;
-  font-size:20px;
+.stat strong{
+  font-size:28px;
 }
 
-.stat-number{
-  font-size:30px;
-  font-weight:bold;
-  margin-top:15px;
-}
 
-.stat-label{
-  color:var(--muted);
-  font-size:13px;
-  margin-top:5px;
-}
-
-/* TOOLBAR */
+/* ================= TOOLBAR ================= */
 
 .toolbar{
   display:flex;
   gap:12px;
-  margin-bottom:18px;
-  flex-wrap:wrap;
+  background:#111;
+  border:1px solid #242424;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:20px;
 }
 
-.search{
+.toolbar input{
   flex:1;
-  min-width:230px;
-  background:var(--card);
-  border:1px solid var(--border);
-  color:white;
-  padding:13px 15px;
-  border-radius:12px;
-  outline:none;
 }
 
-.filter{
-  background:var(--card);
-  color:white;
-  border:1px solid var(--border);
-  padding:13px 15px;
-  border-radius:12px;
-  outline:none;
+.toolbar select{
+  width:190px;
 }
 
-.refresh{
-  background:linear-gradient(135deg,var(--yellow),#d8a900);
-  color:#111;
-  border:0;
-  font-weight:bold;
-  padding:13px 18px;
-  border-radius:12px;
-  cursor:pointer;
-}
 
-/* ORDERS */
+/* ================= TABLE ================= */
 
-.orders-box{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:20px;
+.table-card{
+  background:#111;
+  border:1px solid #242424;
+  border-radius:16px;
   overflow:hidden;
-}
-
-.orders-header{
-  padding:20px;
-  border-bottom:1px solid var(--border);
-}
-
-.orders-header h2{
-  font-size:18px;
 }
 
 .table-wrap{
@@ -321,662 +245,969 @@ button,input{
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:1000px;
+  min-width:1050px;
+}
+
+thead{
+  background:#171717;
 }
 
 th{
-  text-align:left;
-  color:#9298a9;
+  color:#777;
   font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  padding:15px 18px;
-  background:#0d0f15;
+  text-align:left;
+  padding:15px;
+  white-space:nowrap;
 }
 
 td{
-  padding:18px;
-  border-top:1px solid var(--border);
+  padding:15px;
+  border-top:1px solid #222;
   font-size:13px;
-  vertical-align:top;
+  vertical-align:middle;
 }
 
 .order-id{
-  color:var(--yellow);
-  font-weight:bold;
-}
-
-.customer-name{
-  font-weight:bold;
-}
-
-.customer-contact{
-  color:var(--muted);
-  font-size:12px;
-  margin-top:5px;
-}
-
-.package{
-  color:#ddd;
-}
-
-.method{
-  display:inline-block;
-  background:#1c1f2a;
-  border:1px solid var(--border);
-  padding:6px 9px;
-  border-radius:7px;
-  font-size:11px;
+  color:#ff6800;
+  font-weight:800;
 }
 
 .status{
   display:inline-block;
   padding:6px 10px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:bold;
+  border-radius:30px;
+  font-size:10px;
+  font-weight:800;
 }
 
 .status.pending{
-  background:rgba(255,214,0,.12);
-  color:var(--yellow);
+  background:#3b2907;
+  color:#ffc34d;
 }
 
 .status.approved{
-  background:rgba(32,223,112,.12);
-  color:var(--green);
+  background:#06351f;
+  color:#54e49a;
 }
 
 .status.rejected{
-  background:rgba(255,23,68,.12);
-  color:#ff5275;
+  background:#3c0b0b;
+  color:#ff7777;
 }
 
 .actions{
   display:flex;
   gap:7px;
-  flex-wrap:wrap;
 }
 
-.action-btn{
+.approve-btn,
+.reject-btn{
   border:0;
-  padding:8px 10px;
+  color:#fff;
   border-radius:8px;
+  padding:8px 11px;
   cursor:pointer;
-  font-size:11px;
-  font-weight:bold;
+  font-weight:800;
 }
 
-.approve{
-  background:var(--green);
-  color:#04150b;
+.approve-btn{
+  background:#087640;
 }
 
-.reject{
-  background:var(--red);
-  color:white;
+.reject-btn{
+  background:#801919;
 }
 
-.view{
-  background:#282c38;
-  color:white;
+.approve-btn:hover,
+.reject-btn:hover{
+  opacity:.8;
 }
 
-.empty{
-  padding:50px 20px;
+.no-orders{
+  padding:50px;
   text-align:center;
-  color:var(--muted);
+  color:#666;
 }
 
-/* MODAL */
+
+/* ================= MODAL ================= */
 
 .modal{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.75);
-  z-index:500;
+  z-index:9999;
+  background:rgba(0,0,0,.8);
+  backdrop-filter:blur(8px);
   align-items:center;
   justify-content:center;
   padding:20px;
 }
 
-.modal-box{
-  width:100%;
-  max-width:520px;
-  background:#11131b;
-  border:1px solid var(--border);
+.modal.show{
+  display:flex;
+}
+
+.modal-card{
+  width:min(600px,95%);
+  max-height:90vh;
+  overflow:auto;
+  background:#111;
+  border:1px solid #333;
   border-radius:20px;
   padding:25px;
-  box-shadow:0 30px 100px rgba(0,0,0,.7);
 }
 
 .modal-head{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
   margin-bottom:20px;
 }
 
+.modal-head h2{
+  font-size:20px;
+}
+
 .close{
-  background:#20232d;
-  border:0;
-  color:white;
   width:35px;
   height:35px;
-  border-radius:9px;
+  border-radius:50%;
+  border:1px solid #333;
+  background:#171717;
+  color:#fff;
   cursor:pointer;
+  font-size:20px;
 }
 
 .detail{
-  background:#0b0d13;
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:14px;
-  margin-bottom:10px;
+  background:#090909;
+  border:1px solid #202020;
+  border-radius:10px;
+  padding:13px;
+  margin-bottom:9px;
 }
 
 .detail small{
-  color:var(--muted);
   display:block;
+  color:#666;
   margin-bottom:5px;
 }
 
 .detail strong{
-  word-break:break-all;
+  color:#ddd;
+  word-break:break-word;
 }
 
 .modal-actions{
   display:flex;
   gap:10px;
-  margin-top:20px;
+  margin-top:18px;
 }
 
 .modal-actions button{
   flex:1;
   padding:13px;
-  border:0;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:bold;
 }
 
-.download-input{
-  width:100%;
-  background:#090b10;
-  border:1px solid var(--border);
-  color:white;
-  padding:12px;
-  border-radius:10px;
-  outline:none;
-  margin-top:8px;
+
+/* ================= TOAST ================= */
+
+.toast{
+  display:none;
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:99999;
+  max-width:400px;
+  background:#151515;
+  border:1px solid #333;
+  border-radius:12px;
+  padding:14px 18px;
+  box-shadow:0 15px 50px rgba(0,0,0,.6);
+  font-size:13px;
 }
 
-/* RESPONSIVE */
+.toast.success{
+  border-color:#087640;
+}
+
+.toast.error{
+  border-color:#8a2222;
+}
+
+
+/* ================= MOBILE ================= */
 
 @media(max-width:900px){
+
   .stats{
     grid-template-columns:repeat(2,1fr);
   }
+
+  .user-email{
+    display:none;
+  }
+
 }
 
-@media(max-width:600px){
+@media(max-width:650px){
+
   .topbar{
-    padding:13px 15px;
+    padding:15px 4%;
   }
 
-  .container{
-    padding:22px 12px 40px;
-  }
-
-  .page-title h1{
-    font-size:24px;
+  .brand{
+    font-size:18px;
   }
 
   .stats{
-    grid-template-columns:1fr 1fr;
     gap:10px;
   }
 
   .stat{
-    padding:16px;
+    padding:15px;
   }
 
-  .stat-number{
-    font-size:24px;
+  .stat strong{
+    font-size:23px;
   }
 
-  .brand h2{
-    font-size:15px;
+  .toolbar{
+    flex-direction:column;
   }
 
-  .brand span{
-    display:none;
+  .toolbar select{
+    width:100%;
   }
 
-  .logout{
-    padding:8px 11px;
-    font-size:12px;
-  }
 }
 </style>
+
 </head>
 
 <body>
 
-<!-- ================= LOGIN ================= -->
+<!-- =====================================================
+     SUPABASE AUTH LOGIN
+===================================================== -->
 
-<div class="login-screen" id="loginScreen">
+<section id="loginScreen">
 
-  <div class="login-box">
+  <div class="login-card">
 
-    <div class="logo">
-      <div class="logo-icon">🔥</div>
+```
+<div class="logo">
+  FREE FIRE PANEL
+</div>
 
-      <h1>FREE FIRE PANEL</h1>
+<div class="login-sub">
+  Secure Admin Dashboard
+</div>
 
-      <p>Administrator Dashboard</p>
-    </div>
+<label for="email">
+  Admin Email
+</label>
 
-    <div class="input-group">
-      <label>Admin Username</label>
-      <input
-        type="text"
-        id="adminUsername"
-        placeholder="Enter username"
-        autocomplete="off"
-      >
-    </div>
+<input
+  id="email"
+  type="email"
+  placeholder="Enter Supabase Auth email"
+  autocomplete="email"
+>
 
-    <div class="input-group">
-      <label>Admin Password</label>
-      <input
-        type="password"
-        id="adminPassword"
-        placeholder="Enter password"
-      >
-    </div>
+<label for="password">
+  Password
+</label>
 
-    <button class="login-btn" onclick="login()">
-      🔐 LOGIN TO ADMIN
-    </button>
+<input
+  id="password"
+  type="password"
+  placeholder="Enter password"
+  autocomplete="current-password"
+>
 
-    <div class="login-error" id="loginError"></div>
+<button
+  id="loginBtn"
+  class="login-btn">
+  Login
+</button>
+
+<div
+  id="loginError"
+  class="login-error">
+</div>
+```
 
   </div>
 
-</div>
+</section>
 
+<!-- =====================================================
+     ADMIN DASHBOARD
+===================================================== -->
 
-<!-- ================= ADMIN ================= -->
-
-<div class="admin" id="adminPanel">
+<section
+  id="adminPanel"
+  class="hidden">
 
   <header class="topbar">
 
-    <div class="topbar-inner">
+```
+<div class="brand">
+  FREE FIRE PANEL
+  <span>ADMIN DASHBOARD</span>
+</div>
 
-      <div class="brand">
+<div class="user-area">
 
-        <div class="brand-icon">
-          🔥
-        </div>
+  <div
+    id="userEmail"
+    class="user-email">
+  </div>
 
-        <div>
-          <h2>FREE FIRE PANEL</h2>
-          <span>Admin Control Center</span>
-        </div>
+  <button
+    id="logoutBtn"
+    class="logout-btn">
+    Logout
+  </button>
 
-      </div>
-
-      <button class="logout" onclick="logout()">
-        Logout
-      </button>
-
-    </div>
+</div>
+```
 
   </header>
 
-
   <main class="container">
 
-    <div class="page-title">
-      <h1>Dashboard</h1>
-      <p>Manage customer orders and payment verification.</p>
-    </div>
+```
+<!-- STATS -->
 
+<div class="stats">
 
-    <!-- STATS -->
+  <div class="stat">
+    <small>Total Orders</small>
+    <strong id="totalCount">0</strong>
+  </div>
 
-    <div class="stats">
+  <div class="stat">
+    <small>Pending</small>
+    <strong id="pendingCount">0</strong>
+  </div>
 
-      <div class="stat">
+  <div class="stat">
+    <small>Approved</small>
+    <strong id="approvedCount">0</strong>
+  </div>
 
-        <div class="stat-top">
-          <span>Orders</span>
-          <div class="stat-icon">📦</div>
-        </div>
-
-        <div class="stat-number" id="totalOrders">0</div>
-
-        <div class="stat-label">
-          Total orders
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-top">
-          <span>Pending</span>
-          <div class="stat-icon">⏳</div>
-        </div>
-
-        <div class="stat-number" id="pendingOrders">0</div>
-
-        <div class="stat-label">
-          Waiting for verification
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-top">
-          <span>Approved</span>
-          <div class="stat-icon">✅</div>
-        </div>
-
-        <div class="stat-number" id="approvedOrders">0</div>
-
-        <div class="stat-label">
-          Successful payments
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-top">
-          <span>Rejected</span>
-          <div class="stat-icon">❌</div>
-        </div>
-
-        <div class="stat-number" id="rejectedOrders">0</div>
-
-        <div class="stat-label">
-          Rejected payments
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- TOOLBAR -->
-
-    <div class="toolbar">
-
-      <input
-        class="search"
-        id="searchInput"
-        placeholder="🔎 Search Order ID, name, phone, TRXID..."
-        oninput="renderOrders()"
-      >
-
-      <select
-        class="filter"
-        id="statusFilter"
-        onchange="renderOrders()"
-      >
-        <option value="all">All Status</option>
-        <option value="pending">Pending</option>
-        <option value="approved">Approved</option>
-        <option value="rejected">Rejected</option>
-      </select>
-
-      <button class="refresh" onclick="loadOrders()">
-        ↻ Refresh
-      </button>
-
-    </div>
-
-
-    <!-- ORDERS -->
-
-    <section class="orders-box">
-
-      <div class="orders-header">
-        <h2>Customer Orders</h2>
-      </div>
-
-      <div class="table-wrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>Order</th>
-              <th>Customer</th>
-              <th>Package</th>
-              <th>Payment</th>
-              <th>TRXID</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-
-          </thead>
-
-          <tbody id="ordersBody"></tbody>
-
-        </table>
-
-      </div>
-
-    </section>
-
-  </main>
-
-</div>
-
-
-<!-- ================= MODAL ================= -->
-
-<div class="modal" id="detailModal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <h2>Order Details</h2>
-
-      <button class="close" onclick="closeModal()">
-        ×
-      </button>
-
-    </div>
-
-    <div id="modalContent"></div>
-
+  <div class="stat">
+    <small>Rejected</small>
+    <strong id="rejectedCount">0</strong>
   </div>
 
 </div>
 
 
+<!-- SEARCH -->
+
+<div class="toolbar">
+
+  <input
+    id="searchInput"
+    type="text"
+    placeholder="Search Order ID, Name, Phone, Email, TRX ID..."
+  >
+
+  <select id="statusFilter">
+
+    <option value="all">
+      All Status
+    </option>
+
+    <option value="pending">
+      Pending
+    </option>
+
+    <option value="approved">
+      Approved
+    </option>
+
+    <option value="rejected">
+      Rejected
+    </option>
+
+  </select>
+
+</div>
+
+
+<!-- ORDER TABLE -->
+
+<div class="table-card">
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Phone</th>
+          <th>Package</th>
+          <th>Payment</th>
+          <th>TRX ID</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="ordersBody">
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <div
+    id="noOrders"
+    class="no-orders"
+    style="display:none;">
+    No orders found.
+  </div>
+
+</div>
+```
+
+  </main>
+
+</section>
+
+<!-- =====================================================
+     ORDER DETAILS MODAL
+===================================================== -->
+
+<div
+  id="orderModal"
+  class="modal">
+
+  <div class="modal-card">
+
+```
+<div class="modal-head">
+
+  <h2>
+    Order Details
+  </h2>
+
+  <button
+    id="closeModal"
+    class="close">
+    ×
+  </button>
+
+</div>
+
+
+<div class="detail">
+  <small>Order ID</small>
+  <strong id="mOrderId">-</strong>
+</div>
+
+<div class="detail">
+  <small>Customer Name</small>
+  <strong id="mCustomer">-</strong>
+</div>
+
+<div class="detail">
+  <small>Phone</small>
+  <strong id="mPhone">-</strong>
+</div>
+
+<div class="detail">
+  <small>Email</small>
+  <strong id="mEmail">-</strong>
+</div>
+
+<div class="detail">
+  <small>Package</small>
+  <strong id="mPackage">-</strong>
+</div>
+
+<div class="detail">
+  <small>Payment Method</small>
+  <strong id="mPayment">-</strong>
+</div>
+
+<div class="detail">
+  <small>Sender Number / Wallet</small>
+  <strong id="mSender">-</strong>
+</div>
+
+<div class="detail">
+  <small>Transaction ID</small>
+  <strong id="mTrx">-</strong>
+</div>
+
+<div class="detail">
+  <small>Customer Note</small>
+  <strong id="mNote">-</strong>
+</div>
+
+<div class="detail">
+  <small>Status</small>
+  <strong id="mStatus">-</strong>
+</div>
+
+
+<div class="modal-actions">
+
+  <button
+    id="modalApprove"
+    class="approve-btn">
+    ✓ Approve
+  </button>
+
+  <button
+    id="modalReject"
+    class="reject-btn">
+    ✕ Reject
+  </button>
+
+</div>
+```
+
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
 <script>
 
-/* =========================================
-   ADMIN LOGIN
-========================================= */
+/* =====================================================
+   SUPABASE
+===================================================== */
 
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin123";
+const SUPABASE_URL =
+  "https://jwismqdhjfzqkyymavsh.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_834SpxBcbMD6CEkEXx2GXA_84NYcoWL";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
-function login(){
+/* =====================================================
+   AUTOMATIC PANEL DOWNLOAD URL
+===================================================== */
 
-  const username =
-    document.getElementById("adminUsername").value.trim();
+const DOWNLOAD_URL =
+  "https://github.com/antibanpanel/premium-panel/raw/refs/heads/main/panelExtreme.zip";
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let allOrders = [];
+
+let selectedOrder = null;
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const loginScreen =
+  document.getElementById("loginScreen");
+
+const adminPanel =
+  document.getElementById("adminPanel");
+
+const emailInput =
+  document.getElementById("email");
+
+const passwordInput =
+  document.getElementById("password");
+
+const loginBtn =
+  document.getElementById("loginBtn");
+
+const loginError =
+  document.getElementById("loginError");
+
+const logoutBtn =
+  document.getElementById("logoutBtn");
+
+const userEmail =
+  document.getElementById("userEmail");
+
+const ordersBody =
+  document.getElementById("ordersBody");
+
+const noOrders =
+  document.getElementById("noOrders");
+
+const searchInput =
+  document.getElementById("searchInput");
+
+const statusFilter =
+  document.getElementById("statusFilter");
+
+const orderModal =
+  document.getElementById("orderModal");
+
+const closeModal =
+  document.getElementById("closeModal");
+
+const modalApprove =
+  document.getElementById("modalApprove");
+
+const modalReject =
+  document.getElementById("modalReject");
+
+
+/* =====================================================
+   SHOW ERROR
+===================================================== */
+
+function showLoginError(text){
+
+  loginError.textContent =
+    text;
+
+  loginError.style.display =
+    "block";
+
+}
+
+
+/* =====================================================
+   LOGIN WITH SUPABASE AUTH
+===================================================== */
+
+loginBtn.addEventListener(
+  "click",
+  login
+);
+
+
+passwordInput.addEventListener(
+  "keydown",
+  function(e){
+
+    if(e.key === "Enter"){
+      login();
+    }
+
+  }
+);
+
+
+emailInput.addEventListener(
+  "keydown",
+  function(e){
+
+    if(e.key === "Enter"){
+      login();
+    }
+
+  }
+);
+
+
+async function login(){
+
+  const email =
+    emailInput.value.trim();
 
   const password =
-    document.getElementById("adminPassword").value;
+    passwordInput.value;
 
-  const error =
-    document.getElementById("loginError");
+
+  if(!email){
+
+    showLoginError(
+      "Admin email দিন।"
+    );
+
+    return;
+
+  }
+
+
+  if(!password){
+
+    showLoginError(
+      "Password দিন।"
+    );
+
+    return;
+
+  }
+
+
+  loginBtn.disabled =
+    true;
+
+  loginBtn.textContent =
+    "Logging in...";
+
+  loginError.style.display =
+    "none";
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient.auth
+    .signInWithPassword({
+
+      email:
+        email,
+
+      password:
+        password
+
+    });
+
+
+  if(error){
+
+    console.error(
+      "Login Error:",
+      error
+    );
+
+    showLoginError(
+      error.message ||
+      "Login failed."
+    );
+
+    loginBtn.disabled =
+      false;
+
+    loginBtn.textContent =
+      "Login";
+
+    return;
+
+  }
+
+
+  if(!data.session){
+
+    showLoginError(
+      "Login session পাওয়া যায়নি।"
+    );
+
+    loginBtn.disabled =
+      false;
+
+    loginBtn.textContent =
+      "Login";
+
+    return;
+
+  }
+
+
+  showDashboard(
+    data.session
+  );
+
+}
+
+
+/* =====================================================
+   SHOW DASHBOARD
+===================================================== */
+
+function showDashboard(session){
+
+  loginScreen.classList.add(
+    "hidden"
+  );
+
+  adminPanel.classList.remove(
+    "hidden"
+  );
+
+
+  if(session &&
+     session.user){
+
+    userEmail.textContent =
+      session.user.email || "";
+
+  }
+
+
+  loadOrders();
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+logoutBtn.addEventListener(
+  "click",
+  async function(){
+
+    await supabaseClient.auth.signOut();
+
+    allOrders = [];
+
+    selectedOrder = null;
+
+    adminPanel.classList.add(
+      "hidden"
+    );
+
+    loginScreen.classList.remove(
+      "hidden"
+    );
+
+    emailInput.value = "";
+
+    passwordInput.value = "";
+
+    loginBtn.disabled =
+      false;
+
+    loginBtn.textContent =
+      "Login";
+
+  }
+);
+
+
+/* =====================================================
+   CHECK EXISTING SESSION
+===================================================== */
+
+async function checkSession(){
+
+  const {
+    data
+  } = await supabaseClient.auth
+    .getSession();
 
 
   if(
-    username === ADMIN_USERNAME &&
-    password === ADMIN_PASSWORD
+    data &&
+    data.session
   ){
 
-    sessionStorage.setItem(
-      "ff_admin_logged_in",
-      "true"
+    showDashboard(
+      data.session
     );
-
-    document.getElementById("loginScreen").style.display =
-      "none";
-
-    document.getElementById("adminPanel").style.display =
-      "block";
-
-    loadOrders();
 
   }else{
 
-    error.textContent =
-      "❌ Invalid username or password.";
+    loginScreen.classList.remove(
+      "hidden"
+    );
+
+    adminPanel.classList.add(
+      "hidden"
+    );
 
   }
 
 }
 
 
-/* ENTER KEY LOGIN */
-
-document.addEventListener("keydown",function(e){
-
-  if(
-    e.key === "Enter" &&
-    document.getElementById("loginScreen").style.display !== "none"
-  ){
-    login();
-  }
-
-});
+checkSession();
 
 
-/* =========================================
-   LOGOUT
-========================================= */
+/* =====================================================
+   AUTH STATE LISTENER
+===================================================== */
 
-function logout(){
+supabaseClient.auth
+  .onAuthStateChange(
+    function(event, session){
 
-  sessionStorage.removeItem(
-    "ff_admin_logged_in"
-  );
+      if(
+        event === "SIGNED_IN" &&
+        session
+      ){
 
-  location.reload();
-
-}
-
-
-/* =========================================
-   LOGIN CHECK
-========================================= */
-
-window.addEventListener("DOMContentLoaded",function(){
-
-  if(
-    sessionStorage.getItem("ff_admin_logged_in")
-    === "true"
-  ){
-
-    document.getElementById("loginScreen").style.display =
-      "none";
-
-    document.getElementById("adminPanel").style.display =
-      "block";
-
-    loadOrders();
-
-  }
-
-});
-
-
-/* =========================================
-   GET ORDERS
-========================================= */
-
-function getOrders(){
-
-  const orders = [];
-
-  /*
-    Current payment system stores
-    the latest payment here.
-  */
-
-  const payment =
-    localStorage.getItem("ff_payment_data");
-
-  const order =
-    localStorage.getItem("ff_current_order");
-
-
-  if(payment){
-
-    try{
-
-      const paymentData =
-        JSON.parse(payment);
-
-      let orderData = null;
-
-      if(order){
-
-        try{
-          orderData = JSON.parse(order);
-        }catch(e){}
+        showDashboard(
+          session
+        );
 
       }
 
 
-      orders.push({
+      if(
+        event === "SIGNED_OUT"
+      ){
 
-        ...orderData,
+        loginScreen.classList.remove(
+          "hidden"
+        );
 
-        ...paymentData
+        adminPanel.classList.add(
+          "hidden"
+        );
 
-      });
-
-    }catch(e){
-
-      console.log(
-        "Payment data error:",
-        e
-      );
+      }
 
     }
+  );
+
+
+/* =====================================================
+   LOAD ORDERS
+===================================================== */
+
+async function loadOrders(){
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    );
+
+
+  if(error){
+
+    console.error(
+      "Orders Error:",
+      error
+    );
+
+    showToast(
+      "Orders load হয়নি: " +
+      error.message,
+      "error"
+    );
+
+    return;
 
   }
 
-  return orders;
 
-}
-
-
-/* =========================================
-   LOAD ORDERS
-========================================= */
-
-function loadOrders(){
+  allOrders =
+    data || [];
 
   updateStats();
 
@@ -985,563 +1216,724 @@ function loadOrders(){
 }
 
 
-/* =========================================
+/* =====================================================
    STATS
-========================================= */
+===================================================== */
 
 function updateStats(){
 
-  const orders = getOrders();
+  const total =
+    allOrders.length;
+
+  const pending =
+    allOrders.filter(
+      o =>
+        String(
+          o.status || ""
+        ).toLowerCase()
+        === "pending"
+    ).length;
+
+  const approved =
+    allOrders.filter(
+      o =>
+        String(
+          o.status || ""
+        ).toLowerCase()
+        === "approved"
+    ).length;
+
+  const rejected =
+    allOrders.filter(
+      o =>
+        String(
+          o.status || ""
+        ).toLowerCase()
+        === "rejected"
+    ).length;
 
 
-  let pending = 0;
-  let approved = 0;
-  let rejected = 0;
+  document.getElementById(
+    "totalCount"
+  ).textContent =
+    total;
 
+  document.getElementById(
+    "pendingCount"
+  ).textContent =
+    pending;
 
-  orders.forEach(order => {
+  document.getElementById(
+    "approvedCount"
+  ).textContent =
+    approved;
 
-    if(order.status === "pending")
-      pending++;
-
-    if(order.status === "approved")
-      approved++;
-
-    if(order.status === "rejected")
-      rejected++;
-
-  });
-
-
-  document.getElementById("totalOrders")
-    .textContent = orders.length;
-
-  document.getElementById("pendingOrders")
-    .textContent = pending;
-
-  document.getElementById("approvedOrders")
-    .textContent = approved;
-
-  document.getElementById("rejectedOrders")
-    .textContent = rejected;
+  document.getElementById(
+    "rejectedCount"
+  ).textContent =
+    rejected;
 
 }
 
 
-/* =========================================
-   RENDER
-========================================= */
+/* =====================================================
+   RENDER ORDERS
+===================================================== */
 
 function renderOrders(){
 
-  const body =
-    document.getElementById("ordersBody");
-
   const search =
-    document.getElementById("searchInput")
-      .value
-      .toLowerCase()
-      .trim();
+    searchInput.value
+      .trim()
+      .toLowerCase();
 
   const filter =
-    document.getElementById("statusFilter")
-      .value;
+    statusFilter.value;
 
 
-  let orders = getOrders();
+  const orders =
+    allOrders.filter(
+      function(order){
+
+        const searchable =
+          [
+            order.order_id,
+            order.customer_name,
+            order.phone,
+            order.email,
+            order.package,
+            order.trxid,
+            order.payment_method
+          ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
 
 
-  orders = orders.filter(order => {
-
-    const searchable = (
-
-      (order.orderId || "") +
-      " " +
-      (order.customerName || "") +
-      " " +
-      (order.phone || "") +
-      " " +
-      (order.email || "") +
-      " " +
-      (order.trxid || "") +
-      " " +
-      (order.senderNumber || "")
-
-    ).toLowerCase();
+        const matchesSearch =
+          !search ||
+          searchable.includes(
+            search
+          );
 
 
-    const matchesSearch =
-      !search ||
-      searchable.includes(search);
+        const status =
+          String(
+            order.status ||
+            "pending"
+          ).toLowerCase();
 
 
-    const matchesFilter =
-      filter === "all" ||
-      order.status === filter;
+        const matchesStatus =
+          filter === "all" ||
+          status === filter;
 
 
-    return matchesSearch && matchesFilter;
+        return (
+          matchesSearch &&
+          matchesStatus
+        );
 
-  });
+      }
+    );
+
+
+  ordersBody.innerHTML =
+    "";
 
 
   if(!orders.length){
 
-    body.innerHTML = `
-      <tr>
-        <td colspan="7">
-          <div class="empty">
-            📭 No orders found.
-          </div>
-        </td>
-      </tr>
-    `;
+    noOrders.style.display =
+      "block";
 
     return;
 
   }
 
 
-  body.innerHTML = orders.map((order,index) => {
-
-    const status =
-      order.status || "pending";
+  noOrders.style.display =
+    "none";
 
 
-    return `
+  orders.forEach(
+    function(order){
 
-      <tr>
-
-        <td>
-          <div class="order-id">
-            ${escapeHTML(order.orderId || "N/A")}
-          </div>
-
-          <div class="customer-contact">
-            ${formatDate(order.submittedAt || order.createdAt)}
-          </div>
-        </td>
+      const tr =
+        document.createElement(
+          "tr"
+        );
 
 
-        <td>
+      const status =
+        String(
+          order.status ||
+          "pending"
+        ).toLowerCase();
 
-          <div class="customer-name">
-            ${escapeHTML(order.customerName || "N/A")}
-          </div>
 
-          <div class="customer-contact">
-            ${escapeHTML(order.phone || "")}
-          </div>
+      const date =
+        order.created_at
+          ? new Date(
+              order.created_at
+            ).toLocaleString()
+          : "-";
 
-          <div class="customer-contact">
-            ${escapeHTML(order.email || "")}
-          </div>
 
-        </td>
-
+      tr.innerHTML = `
 
         <td>
-
-          <div class="package">
-            ${escapeHTML(order.package || "N/A")}
-          </div>
-
-        </td>
-
-
-        <td>
-
-          <span class="method">
-            ${escapeHTML(
-              order.method || "Not selected"
+          <span class="order-id">
+            ${escapeHtml(
+              order.order_id || "-"
             )}
           </span>
-
-          <div class="customer-contact">
-            ${escapeHTML(
-              order.senderNumber || ""
-            )}
-          </div>
-
         </td>
 
-
         <td>
-
-          <div style="
-            max-width:170px;
-            word-break:break-all;
-            color:#ddd;
-          ">
-            ${escapeHTML(order.trxid || "N/A")}
-          </div>
-
+          ${escapeHtml(
+            order.customer_name || "-"
+          )}
         </td>
 
+        <td>
+          ${escapeHtml(
+            order.phone || "-"
+          )}
+        </td>
 
         <td>
+          ${escapeHtml(
+            order.package || "-"
+          )}
+        </td>
 
+        <td>
+          ${escapeHtml(
+            order.payment_method || "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHtml(
+            order.trxid || "-"
+          )}
+        </td>
+
+        <td>
           <span class="status ${status}">
             ${status.toUpperCase()}
           </span>
-
         </td>
 
+        <td>
+          ${escapeHtml(date)}
+        </td>
 
         <td>
 
           <div class="actions">
 
             <button
-              class="action-btn view"
-              onclick="viewOrder('${escapeJS(order.orderId)}')"
-            >
-              View
+              class="approve-btn"
+              onclick="approveOrder('${escapeJs(order.order_id)}')">
+              ✓
             </button>
 
-
-            ${
-              status === "pending"
-              ? `
-
-                <button
-                  class="action-btn approve"
-                  onclick="approveOrder('${escapeJS(order.orderId)}')"
-                >
-                  Approve
-                </button>
-
-                <button
-                  class="action-btn reject"
-                  onclick="rejectOrder('${escapeJS(order.orderId)}')"
-                >
-                  Reject
-                </button>
-
-              `
-              : ""
-            }
+            <button
+              class="reject-btn"
+              onclick="rejectOrder('${escapeJs(order.order_id)}')">
+              ✕
+            </button>
 
           </div>
 
         </td>
 
-      </tr>
+      `;
 
-    `;
 
-  }).join("");
+      tr.addEventListener(
+        "dblclick",
+        function(){
+
+          openOrder(
+            order.order_id
+          );
+
+        }
+      );
+
+
+      ordersBody.appendChild(
+        tr
+      );
+
+    }
+  );
 
 }
 
 
-/* =========================================
-   VIEW ORDER
-========================================= */
+/* =====================================================
+   OPEN ORDER
+===================================================== */
 
-function viewOrder(orderId){
-
-  const orders = getOrders();
+function openOrder(id){
 
   const order =
-    orders.find(
-      x => x.orderId === orderId
+    allOrders.find(
+      o =>
+        o.order_id === id
     );
 
 
-  if(!order) return;
+  if(!order){
+    return;
+  }
 
 
-  document.getElementById("modalContent").innerHTML = `
-
-    <div class="detail">
-      <small>Order ID</small>
-      <strong>${escapeHTML(order.orderId || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Customer Name</small>
-      <strong>${escapeHTML(order.customerName || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Phone / WhatsApp</small>
-      <strong>${escapeHTML(order.phone || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Email</small>
-      <strong>${escapeHTML(order.email || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Package</small>
-      <strong>${escapeHTML(order.package || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Payment Method</small>
-      <strong>${escapeHTML(order.method || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Sender Number</small>
-      <strong>${escapeHTML(order.senderNumber || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Transaction ID</small>
-      <strong>${escapeHTML(order.trxid || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Status</small>
-      <strong>${escapeHTML(order.status || "")}</strong>
-    </div>
-
-    <div class="detail">
-      <small>Submitted At</small>
-      <strong>${formatDate(order.submittedAt)}</strong>
-    </div>
-
-    ${
-      order.note
-      ? `
-        <div class="detail">
-          <small>Customer Note</small>
-          <strong>${escapeHTML(order.note)}</strong>
-        </div>
-      `
-      : ""
-    }
-
-  `;
+  selectedOrder =
+    order;
 
 
-  document.getElementById("detailModal")
-    .style.display = "flex";
+  document.getElementById(
+    "mOrderId"
+  ).textContent =
+    order.order_id || "-";
+
+
+  document.getElementById(
+    "mCustomer"
+  ).textContent =
+    order.customer_name || "-";
+
+
+  document.getElementById(
+    "mPhone"
+  ).textContent =
+    order.phone || "-";
+
+
+  document.getElementById(
+    "mEmail"
+  ).textContent =
+    order.email || "-";
+
+
+  document.getElementById(
+    "mPackage"
+  ).textContent =
+    order.package || "-";
+
+
+  document.getElementById(
+    "mPayment"
+  ).textContent =
+    order.payment_method || "-";
+
+
+  document.getElementById(
+    "mSender"
+  ).textContent =
+    order.sender_number || "-";
+
+
+  document.getElementById(
+    "mTrx"
+  ).textContent =
+    order.trxid || "-";
+
+
+  document.getElementById(
+    "mNote"
+  ).textContent =
+    order.note || "-";
+
+
+  document.getElementById(
+    "mStatus"
+  ).textContent =
+    order.status || "pending";
+
+
+  orderModal.classList.add(
+    "show"
+  );
 
 }
 
 
-/* =========================================
-   APPROVE
-========================================= */
-
-function approveOrder(orderId){
-
-  const downloadURL =
-    prompt(
-      "Approved হলে customer যে ZIP/file download করবে তার URL দিন:"
-    );
-
-
-  if(downloadURL === null)
-    return;
-
-
-  const payment =
-    localStorage.getItem("ff_payment_data");
-
-
-  if(!payment){
-
-    alert("Payment data পাওয়া যায়নি.");
-
-    return;
-
-  }
-
-
-  try{
-
-    const data =
-      JSON.parse(payment);
-
-
-    if(data.orderId !== orderId){
-
-      alert(
-        "এই order-এর payment data পাওয়া যায়নি."
-      );
-
-      return;
-
-    }
-
-
-    data.status = "approved";
-
-    data.downloadUrl =
-      downloadURL.trim();
-
-    data.approvedAt =
-      new Date().toISOString();
-
-
-    localStorage.setItem(
-      "ff_payment_data",
-      JSON.stringify(data)
-    );
-
-
-    alert(
-      "✅ Payment Approved Successfully!"
-    );
-
-
-    loadOrders();
-
-  }catch(e){
-
-    alert(
-      "Data update করতে সমস্যা হয়েছে."
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   REJECT
-========================================= */
-
-function rejectOrder(orderId){
-
-  const confirmReject =
-    confirm(
-      "এই payment reject করতে চান?"
-    );
-
-
-  if(!confirmReject)
-    return;
-
-
-  const payment =
-    localStorage.getItem("ff_payment_data");
-
-
-  if(!payment){
-
-    alert("Payment data পাওয়া যায়নি.");
-
-    return;
-
-  }
-
-
-  try{
-
-    const data =
-      JSON.parse(payment);
-
-
-    if(data.orderId !== orderId){
-
-      alert(
-        "এই order-এর payment data পাওয়া যায়নি."
-      );
-
-      return;
-
-    }
-
-
-    data.status = "rejected";
-
-    data.rejectedAt =
-      new Date().toISOString();
-
-
-    localStorage.setItem(
-      "ff_payment_data",
-      JSON.stringify(data)
-    );
-
-
-    alert(
-      "❌ Payment Rejected."
-    );
-
-
-    loadOrders();
-
-  }catch(e){
-
-    alert(
-      "Data update করতে সমস্যা হয়েছে."
-    );
-
-  }
-
-}
-
-
-/* =========================================
+/* =====================================================
    CLOSE MODAL
-========================================= */
+===================================================== */
 
-function closeModal(){
-
-  document.getElementById("detailModal")
-    .style.display = "none";
-
-}
+closeModal.addEventListener(
+  "click",
+  closeModalWindow
+);
 
 
-document.getElementById("detailModal")
-  .addEventListener("click",function(e){
+orderModal.addEventListener(
+  "click",
+  function(e){
 
-    if(e.target === this){
-      closeModal();
+    if(
+      e.target === orderModal
+    ){
+
+      closeModalWindow();
+
     }
 
-  });
+  }
+);
 
 
-/* =========================================
-   HELPERS
-========================================= */
+function closeModalWindow(){
 
-function escapeHTML(value){
+  orderModal.classList.remove(
+    "show"
+  );
 
-  return String(value || "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+  selectedOrder =
+    null;
 
 }
 
 
-function escapeJS(value){
+/* =====================================================
+   APPROVE
+===================================================== */
 
-  return String(value || "")
-    .replace(/\\/g,"\\\\")
-    .replace(/'/g,"\\'")
-    .replace(/"/g,'\\"');
+async function approveOrder(
+  orderId
+){
 
-}
+  const order =
+    allOrders.find(
+      o =>
+        o.order_id === orderId
+    );
 
 
-function formatDate(date){
+  if(!order){
+    return;
+  }
 
-  if(!date)
-    return "N/A";
 
-  try{
+  const confirmed =
+    confirm(
+      "Approve this payment?\n\n" +
+      "Order ID: " +
+      orderId +
+      "\n\n" +
+      "Customer will automatically receive the panel download."
+    );
 
-    return new Date(date)
-      .toLocaleString();
 
-  }catch(e){
+  if(!confirmed){
+    return;
+  }
 
-    return date;
+
+  /*
+    IMPORTANT:
+    No URL input.
+    GitHub ZIP URL automatically saved.
+  */
+
+  const {
+    error
+  } = await supabaseClient
+    .from("orders")
+    .update({
+
+      status:
+        "approved",
+
+      download_url:
+        DOWNLOAD_URL,
+
+      approved_at:
+        new Date().toISOString(),
+
+      rejected_at:
+        null
+
+    })
+    .eq(
+      "order_id",
+      orderId
+    );
+
+
+  if(error){
+
+    console.error(
+      "Approve Error:",
+      error
+    );
+
+    showToast(
+      "Approve হয়নি: " +
+      error.message,
+      "error"
+    );
+
+    return;
 
   }
+
+
+  showToast(
+    "Order approved ✓",
+    "success"
+  );
+
+
+  closeModalWindow();
+
+  await loadOrders();
+
+}
+
+
+/* =====================================================
+   REJECT
+===================================================== */
+
+async function rejectOrder(
+  orderId
+){
+
+  const confirmed =
+    confirm(
+      "Reject this payment?\n\n" +
+      "Order ID: " +
+      orderId
+    );
+
+
+  if(!confirmed){
+    return;
+  }
+
+
+  const {
+    error
+  } = await supabaseClient
+    .from("orders")
+    .update({
+
+      status:
+        "rejected",
+
+      rejected_at:
+        new Date().toISOString(),
+
+      download_url:
+        null
+
+    })
+    .eq(
+      "order_id",
+      orderId
+    );
+
+
+  if(error){
+
+    console.error(
+      "Reject Error:",
+      error
+    );
+
+    showToast(
+      "Reject হয়নি: " +
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showToast(
+    "Order rejected.",
+    "success"
+  );
+
+
+  closeModalWindow();
+
+  await loadOrders();
+
+}
+
+
+/* =====================================================
+   MODAL BUTTONS
+===================================================== */
+
+modalApprove.addEventListener(
+  "click",
+  function(){
+
+    if(
+      selectedOrder &&
+      selectedOrder.order_id
+    ){
+
+      approveOrder(
+        selectedOrder.order_id
+      );
+
+    }
+
+  }
+);
+
+
+modalReject.addEventListener(
+  "click",
+  function(){
+
+    if(
+      selectedOrder &&
+      selectedOrder.order_id
+    ){
+
+      rejectOrder(
+        selectedOrder.order_id
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+searchInput.addEventListener(
+  "input",
+  renderOrders
+);
+
+
+statusFilter.addEventListener(
+  "change",
+  renderOrders
+);
+
+
+/* =====================================================
+   AUTO REFRESH ORDERS
+===================================================== */
+
+setInterval(
+  async function(){
+
+    if(
+      !adminPanel.classList.contains(
+        "hidden"
+      )
+    ){
+
+      await loadOrders();
+
+    }
+
+  },
+  10000
+);
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+function showToast(
+  text,
+  type
+){
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+
+  toast.textContent =
+    text;
+
+  toast.className =
+    "toast " +
+    (type || "");
+
+  toast.style.display =
+    "block";
+
+
+  setTimeout(
+    function(){
+
+      toast.style.display =
+        "none";
+
+    },
+    3500
+  );
+
+}
+
+
+/* =====================================================
+   ESCAPE HELPERS
+===================================================== */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function escapeJs(value){
+
+  return String(value)
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+    .replace(
+      /'/g,
+      "\\'"
+    );
 
 }
 
