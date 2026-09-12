@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Free Fire Panel Store</title>
+  <meta name="description" content="Free Fire Panel Store - plans, features, pricing and support.">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#07080d;
+      --card:#11131b;
+      --card2:#171a24;
+      --red:#ff1744;
+      --yellow:#ffd600;
+      --text:#fff;
+      --muted:#a8adbd;
+      --line:#282c3a;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      font-family:Inter,Arial,sans-serif;
+      background:
+        radial-gradient(circle at 15% 5%,#32101c 0,transparent 28%),
+        radial-gradient(circle at 85% 10%,#1c1d42 0,transparent 30%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.5;
+    }
+
+    a{
+      text-decoration:none;
+      color:inherit;
+    }
+
+    button,
+    input,
+    select,
+    textarea{
+      font:inherit;
+    }
+
+    .container{
+      width:min(1120px,92%);
+      margin:auto;
+    }
+
+    nav{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(7,8,13,.86);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .nav{
+      height:70px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .logo{
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:.5px;
+    }
+
+    .logo span{
+      color:var(--yellow);
+    }
+
+    .navlinks{
+      display:flex;
+      gap:24px;
+      color:#ddd;
+    }
+
+    .navlinks a:hover{
+      color:var(--yellow);
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:13px 22px;
+      border-radius:12px;
+      font-weight:800;
+      border:1px solid transparent;
+      cursor:pointer;
+    }
+
+    .btn-red{
+      background:linear-gradient(135deg,#ff1744,#c5002d);
+      box-shadow:0 10px 30px #ff17442e;
+    }
+
+    .btn-yellow{
+      background:var(--yellow);
+      color:#111;
+    }
+
+    .btn-outline{
+      border-color:#45495a;
+      background:#11131b;
+    }
+
+    .hero{
+      padding:90px 0 60px;
+      text-align:center;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:7px 13px;
+      border:1px solid #4c4250;
+      border-radius:99px;
+      color:var(--yellow);
+      background:#171019;
+      font-weight:800;
+      font-size:13px;
+    }
+
+    h1{
+      font-size:clamp(44px,8vw,86px);
+      line-height:.95;
+      margin:22px 0 20px;
+      text-transform:uppercase;
+    }
+
+    h1 span{
+      color:var(--yellow);
+      text-shadow:0 0 30px #ffd60033;
+    }
+
+    .hero p{
+      max-width:720px;
+      margin:auto;
+      color:var(--muted);
+      font-size:18px;
+    }
+
+    .actions{
+      margin-top:28px;
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin:45px 0;
+    }
+
+    .stat{
+      background:linear-gradient(145deg,#151822,#0d0f15);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:22px;
+      text-align:center;
+    }
+
+    .stat b{
+      display:block;
+      font-size:25px;
+      color:var(--yellow);
+    }
+
+    .stat small{
+      color:var(--muted);
+    }
+
+    section{
+      padding:55px 0;
+    }
+
+    .section-title{
+      text-align:center;
+      margin-bottom:35px;
+    }
+
+    .section-title h2{
+      font-size:36px;
+    }
+
+    .section-title p{
+      color:var(--muted);
+      margin-top:8px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+
+    .card{
+      background:linear-gradient(145deg,#141720,#0d0f15);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:26px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card.popular{
+      border-color:#ff1744;
+      box-shadow:0 0 35px #ff174414;
+    }
+
+    .ribbon{
+      position:absolute;
+      right:15px;
+      top:15px;
+      background:var(--red);
+      padding:5px 10px;
+      border-radius:99px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .price{
+      font-size:40px;
+      font-weight:900;
+      margin:16px 0;
+    }
+
+    .price small{
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .features{
+      list-style:none;
+      margin:20px 0;
+    }
+
+    .features li{
+      padding:9px 0;
+      border-bottom:1px solid #242733;
+      color:#ddd;
+    }
+
+    .features li::before{
+      content:"✓";
+      color:var(--yellow);
+      font-weight:900;
+      margin-right:9px;
+    }
+
+    .card .btn{
+      width:100%;
+    }
+
+    .feature-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:15px;
+    }
+
+    .feature{
+      padding:22px;
+      border:1px solid var(--line);
+      border-radius:17px;
+      background:#10121a;
+    }
+
+    .icon{
+      font-size:28px;
+      margin-bottom:10px;
+    }
+
+    .feature h3{
+      font-size:17px;
+    }
+
+    .feature p{
+      color:var(--muted);
+      font-size:14px;
+      margin-top:6px;
+    }
+
+    .faq{
+      max-width:820px;
+      margin:auto;
+    }
+
+    details{
+      background:#11131b;
+      border:1px solid var(--line);
+      border-radius:14px;
+      margin:10px 0;
+      padding:17px;
+    }
+
+    summary{
+      cursor:pointer;
+      font-weight:800;
+    }
+
+    details p{
+      color:var(--muted);
+      padding-top:12px;
+    }
+
+    .order{
+      background:linear-gradient(135deg,#220914,#15101a);
+      border:1px solid #5a1d2d;
+      border-radius:24px;
+      padding:40px;
+      text-align:center;
+    }
+
+    footer{
+      border-top:1px solid var(--line);
+      padding:30px 0;
+      color:var(--muted);
+      text-align:center;
+    }
+
+    .note{
+      font-size:12px;
+      color:#777;
+      margin-top:18px;
+    }
+
+    .order-form{
+      max-width:760px;
+      margin:28px auto 0;
+      text-align:left;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+    }
+
+    .field.full{
+      grid-column:1/-1;
+    }
+
+    .field label{
+      font-size:13px;
+      font-weight:800;
+      color:#ddd;
+    }
+
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%;
+      padding:13px 14px;
+      border-radius:11px;
+      border:1px solid #343847;
+      background:#0b0d13;
+      color:#fff;
+      outline:none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus{
+      border-color:#ffd600;
+    }
+
+    .field textarea{
+      min-height:90px;
+      resize:vertical;
+    }
+
+    .payment-box{
+      max-width:760px;
+      margin:24px auto 0;
+      text-align:left;
+    }
+
+    .payment-methods{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:9px;
+      margin:15px 0;
+    }
+
+    .pay-method{
+      padding:12px 7px;
+      border:1px solid #343847;
+      border-radius:11px;
+      background:#0b0d13;
+      color:#ddd;
+      text-align:center;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .pay-method.active{
+      border-color:var(--yellow);
+      color:var(--yellow);
+      box-shadow:0 0 18px #ffd60018;
+    }
+
+    .payment-info{
+      display:none;
+      background:#0b0d13;
+      border:1px solid #343847;
+      border-radius:14px;
+      padding:18px;
+      margin-top:12px;
+    }
+
+    .payment-info.show{
+      display:block;
+    }
+
+    .payment-number{
+      font-size:21px;
+      font-weight:900;
+      color:var(--yellow);
+      margin:6px 0;
+      word-break:break-all;
+    }
+
+    .copy-btn{
+      padding:7px 10px;
+      border:1px solid #444957;
+      border-radius:8px;
+      background:#171a24;
+      color:#fff;
+      cursor:pointer;
+    }
+
+    .payment-warning{
+      font-size:12px;
+      color:#9da2b2;
+      margin-top:10px;
+    }
+
+    .verify-box{
+      display:none;
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid #292d39;
+    }
+
+    .verify-box.show{
+      display:block;
+    }
+
+    .download-box{
+      display:none;
+      margin-top:18px;
+      padding:18px;
+      border:1px solid #384b3d;
+      background:#0c1510;
+      border-radius:14px;
+    }
+
+    .download-box.show{
+      display:block;
+    }
+
+    .status{
+      display:inline-block;
+      margin-top:8px;
+      padding:5px 9px;
+      border-radius:99px;
+      background:#332900;
+      color:var(--yellow);
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .admin-panel{
+      display:none;
+      max-width:980px;
+      margin:24px auto 0;
+      text-align:left;
+    }
+
+    .admin-login{
+      max-width:430px;
+      margin:0 auto;
+    }
+
+    .admin-table-wrap{
+      overflow-x:auto;
+      margin-top:18px;
+    }
+
+    .admin-table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+    }
+
+    .admin-table th,
+    .admin-table td{
+      padding:11px;
+      border-bottom:1px solid #292d39;
+      text-align:left;
+      font-size:13px;
+    }
+
+    .admin-table th{
+      color:var(--yellow);
+    }
+
+    .order-row{
+      background:#0c0e14;
+    }
+
+    .admin-actions{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+    }
+
+    .small-btn{
+      padding:7px 10px;
+      border-radius:8px;
+      border:1px solid #3d4251;
+      background:#171a24;
+      color:#fff;
+      cursor:pointer;
+      font-weight:700;
+    }
+
+    .small-btn.approve{
+      border-color:#426f4c;
+    }
+
+    .small-btn.reject{
+      border-color:#6f4242;
+    }
+
+    .admin-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:15px;
+      flex-wrap:wrap;
+    }
+
+    .admin-stat{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    @media(max-width:800px){
+      .navlinks{
+        display:none;
+      }
+
+      .stats,
+      .grid,
+      .feature-grid{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media(max-width:700px){
+      .payment-methods{
+        grid-template-columns:repeat(3,1fr);
+      }
+    }
+
+    @media(max-width:520px){
+      .stats,
+      .grid,
+      .feature-grid{
+        grid-template-columns:1fr;
+      }
+
+      .hero{
+        padding-top:60px;
+      }
+
+      .order{
+        padding:28px 18px;
+      }
+
+      .form-grid{
+        grid-template-columns:1fr;
+      }
+
+      .field.full{
+        grid-column:auto;
+      }
+
+      .payment-methods{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="container nav">
+      <div class="logo">
+        FREE <span>FIRE</span> PANEL
+      </div>
+
+      <div class="navlinks">
+        <a href="#plans">Plans</a>
+        <a href="#features">Features</a>
+        <a href="#faq">FAQ</a>
+        <a href="#order">Order</a>
+      </div>
+
+      <a class="btn btn-red" href="#plans">
+        View Plans
+      </a>
+    </div>
+  </nav>
+
+
+  <!-- HERO -->
+  <header class="hero container">
+
+    <div class="badge">
+      ⚡ FAST DELIVERY • 24/7 SUPPORT
+    </div>
+
+    <h1>
+      Premium <span>Panel</span>
+    </h1>
+
+    <p>
+      📱 Mobile & PC — দু’টির জন্যই Premium Panel Available<br>
+      🛡️ Enhanced Anti-Ban Protection & Secure Service<br>
+      ⚡ Fast & Smooth Performance
+    </p>
+
+    <div style="max-width:900px;margin:30px auto;">
+
+      <iframe
+        src="https://player.vimeo.com/video/1161419468"
+        width="100%"
+        height="500"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        style="border-radius:18px;">
+      </iframe>
+
+    </div>
+
+    <div class="actions">
+
+      <a class="btn btn-yellow" href="#plans">
+        See Packages
+      </a>
+
+      <a
+        class="btn btn-outline"
+        href="https://wa.me/8801311282081"
+        target="_blank"
+        rel="noopener">
+        Contact Seller
+      </a>
+
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+        <b>5</b>
+        <small>Plans</small>
+      </div>
+
+      <div class="stat">
+        <b>24/7</b>
+        <small>Support</small>
+      </div>
+
+      <div class="stat">
+        <b>Fast</b>
+        <small>Delivery</small>
+      </div>
+
+      <div class="stat">
+        <b>Secure</b>
+        <small>Checkout</small>
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- FEATURES -->
+  <section id="features">
+
+    <div class="container">
+
+      <div class="section-title">
+        <h2>Panel Details</h2>
+        <p>Everything a customer needs to know before ordering.</p>
+      </div>
+
+      <div class="feature-grid">
+
+        <div class="feature">
+          <div class="icon">⚡</div>
+          <h3>Quick Setup</h3>
+          <p>
+            Clear setup instructions after purchase.
+          </p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">📱</div>
+          <h3>Device Support</h3>
+          <p>
+            Show the devices/OS versions actually supported by your product.
+          </p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">🛡️</div>
+          <h3>Account Safety</h3>
+          <p>
+            Never promise “100% no ban”; explain real limitations honestly.
+          </p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">🎧</div>
+          <h3>Customer Support</h3>
+          <p>
+            Support channel for setup and product questions.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- PLANS -->
+  <section id="plans">
+
+    <div class="container">
+
+      <div class="section-title">
+        <h2>Choose Your Plan</h2>
+        <p>Choose the panel package that fits you best.</p>
+      </div>
+
+      <div class="grid">
+
+
+        <!-- PLAN 1 -->
+        <div class="card">
+
+          <h3>1 MONTH</h3>
+
+          <div class="price">
+            ৳99 <small>/ month</small>
+          </div>
+
+          <ul class="features">
+            <li>1-month panel access</li>
+            <li>Setup assistance</li>
+            <li>Customer support</li>
+          </ul>
+
+          <a
+            class="btn btn-outline order-btn"
+            data-plan="1 Month — ৳99"
+            href="#order">
+            Order Now
+          </a>
+
+        </div>
+
+
+        <!-- PLAN 2 -->
+        <div class="card popular">
+
+          <div class="ribbon">
+            PREMIUM
+          </div>
+
+          <h3>1 MONTH PREMIUM</h3>
+
+          <div class="price">
+            ৳199 <small>/ month</small>
+          </div>
+
+          <ul class="features">
+            <li>1-month premium access</li>
+            <li>Priority support</li>
+            <li>Setup assistance</li>
+          </ul>
+
+          <a
+            class="btn btn-red order-btn"
+            data-plan="1 Month Premium — ৳199"
+            href="#order">
+            Order Now
+          </a>
+
+        </div>
+
+
+        <!-- PLAN 3 -->
+        <div class="card">
+
+          <h3>2 MONTH PREMIUM</h3>
+
+          <div class="price">
+            ৳299 <small>/ 2 months</small>
+          </div>
+
+          <ul class="features">
+            <li>2-month premium access</li>
+            <li>Priority support</li>
+            <li>Setup assistance</li>
+          </ul>
+
+          <a
+            class="btn btn-outline order-btn"
+            data-plan="2 Month Premium — ৳299"
+            href="#order">
+            Order Now
+          </a>
+
+        </div>
+
+
+        <!-- PLAN 4 -->
+        <div class="card">
+
+          <h3>6 MONTH</h3>
+
+          <div class="price">
+            ৳599 <small>/ 6 months</small>
+          </div>
+
+          <ul class="features">
+            <li>6-month panel access</li>
+            <li>Priority support</li>
+            <li>Setup assistance</li>
+          </ul>
+
+          <a
+            class="btn btn-outline order-btn"
+            data-plan="6 Month — ৳599"
+            href="#order">
+            Order Now
+          </a>
+
+        </div>
+
+
+        <!-- PLAN 5 -->
+        <div class="card popular">
+
+          <div class="ribbon">
+            BEST VALUE
+          </div>
+
+          <h3>LIFETIME PREMIUM</h3>
+
+          <div class="price">
+            ৳999 <small>/ lifetime</small>
+          </div>
+
+          <ul class="features">
+            <li>Lifetime premium access</li>
+            <li>Priority support</li>
+            <li>Setup assistance</li>
+          </ul>
+
+          <a
+            class="btn btn-red order-btn"
+            data-plan="Lifetime Premium — ৳999"
+            href="#order">
+            Order Now
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ORDER -->
+  <section>
+
+    <div class="container">
+
+      <div class="order" id="order">
+
+        <div
+          class="section-title"
+          style="margin-bottom:18px">
+
+          <h2>Place Your Order</h2>
+
+          <p>
+            Fill in the form. Your order ID will be generated automatically.
+          </p>
+
+        </div>
+
+
+        <!-- ORDER FORM -->
+        <form
+          class="order-form"
+          id="orderForm">
+
+          <div class="form-grid">
+
+
+            <div class="field">
+
+              <label for="plan">
+                Select Package *
+              </label>
+
+              <select id="plan" required>
+
+                <option value="">
+                  Choose a package
+                </option>
+
+                <option value="1 Month — ৳99">
+                  1 Month — ৳99
+                </option>
+
+                <option value="1 Month Premium — ৳199">
+                  1 Month Premium — ৳199
+                </option>
+
+                <option value="2 Month Premium — ৳299">
+                  2 Month Premium — ৳299
+                </option>
+
+                <option value="6 Month — ৳599">
+                  6 Month — ৳599
+                </option>
+
+                <option value="Lifetime Premium — ৳999">
+                  Lifetime Premium — ৳999
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="name">
+                Customer Name *
+              </label>
+
+              <input
+                id="name"
+                required
+                placeholder="Your name">
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="contact">
+                WhatsApp / Contact *
+              </label>
+
+              <input
+                id="contact"
+                required
+                placeholder="01XXXXXXXXX">
+
+            </div>
+
+
+            <div class="field">
+
+  <label for="email">
+    Email *
+  </label>
+
+  <input
+    type="email"
+    id="email"
+    required
+    placeholder="Enter your email">
+
+</div>
+
+
+            <div class="field full">
+
+              <label for="noteInput">
+                Additional Note
+              </label>
+
+              <textarea
+                id="noteInput"
+                placeholder="Any order instructions..."></textarea>
+
+            </div>
+
+
+            <div class="field full">
+
+              <button
+                class="btn btn-red"
+                type="submit">
+
+                🛒 Create Order & Continue
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </form>
+
+
+        <!-- PAYMENT BOX -->
+        <div
+          class="payment-box"
+          id="paymentBox"
+          style="display:none">
+
+          <h3 style="margin-bottom:5px">
+            2. Complete Payment
+          </h3>
+
+          <p style="color:var(--muted)">
+
+            Order ID:
+            <strong id="payOrderId"></strong>
+
+            · Amount:
+
+            <strong id="payAmount"></strong>
+
+          </p>
+
+
+          <!-- PAYMENT METHODS -->
+          <div class="payment-methods">
+
+            <button
+              type="button"
+              class="pay-method"
+              data-method="bKash">
+              bKash
+            </button>
+
+            <button
+              type="button"
+              class="pay-method"
+              data-method="Nagad">
+              Nagad
+            </button>
+
+            <button
+              type="button"
+              class="pay-method"
+              data-method="Rocket">
+              Rocket
+            </button>
+
+            <button
+              type="button"
+              class="pay-method"
+              data-method="Upay">
+              Upay
+            </button>
+
+            <button
+              type="button"
+              class="pay-method"
+              data-method="USDT BEP20">
+              USDT<br>BEP20
+            </button>
+
+          </div>
+
+
+          <!-- PAYMENT ACCOUNT -->
+          <div
+            class="payment-info"
+            id="paymentInfo">
+
+            <div id="paymentTitle">
+              Payment account
+            </div>
+
+            <div
+              class="payment-number"
+              id="paymentNumber">
+              Select a method
+            </div>
+
+            <button
+              type="button"
+              class="copy-btn"
+              id="copyPayment">
+              Copy
+            </button>
+
+            <p class="payment-warning">
+              Only send the exact order amount.
+              Send payment only to the selected account/address shown above.
+            </p>
+
+          </div>
+
+
+          <!-- VERIFY -->
+          <div
+            class="verify-box"
+            id="verifyBox">
+
+            <h3>
+              3. Verify Payment
+            </h3>
+
+            <p
+              style="color:var(--muted);margin:5px 0 14px">
+
+              After payment, enter the transaction/reference ID.
+
+            </p>
+
+
+            <div class="form-grid">
+
+
+              <div class="field">
+
+                <label for="transactionId">
+                  Transaction / Reference ID *
+                </label>
+
+                <input
+                  id="transactionId"
+                  placeholder="e.g. TXN123456">
+
+              </div>
+
+
+              <div class="field">
+
+                <label for="payer">
+                  Payer Number / Wallet
+                </label>
+
+                <input
+                  id="payer"
+                  placeholder="Your payment number/wallet">
+
+              </div>
+
+
+              <div class="field full">
+
+                <button
+                  class="btn btn-yellow"
+                  type="button"
+                  id="verifyBtn">
+
+                  ✓ Submit Payment Verification
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div
+              id="verifyStatus"
+              style="display:none;margin-top:14px">
+            </div>
+
+
+            <!-- WAITING -->
+            <div
+              id="waitingBox"
+              style="
+                display:none;
+                margin-top:18px;
+                padding:20px;
+                border:1px solid #3b4050;
+                background:#10131c;
+                border-radius:14px;
+                text-align:center;
+              ">
+
+              <div
+                style="font-size:28px;margin-bottom:8px">
+                ⏳
+              </div>
+
+              <strong style="font-size:18px">
+                Please wait 5 minutes on this page
+              </strong>
+
+              <p
+                style="color:var(--muted);margin:8px 0 12px">
+
+                Your order is being checked.
+                Please keep this page open.
+
+              </p>
+
+              <div
+                id="waitingTimer"
+                style="
+                  font-size:24px;
+                  font-weight:900;
+                  color:var(--yellow);
+                ">
+                05:00
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- DOWNLOAD -->
+          <div
+            class="download-box"
+            id="downloadBox">
+
+            <strong>
+              🔒 Payment Verified — Order Confirmed
+            </strong>
+
+            <p
+              style="color:var(--muted);margin:7px 0 14px">
+
+              Your panel file is ready for download.
+
+            </p>
+
+            <a
+              class="btn btn-red"
+              id="downloadBtn"
+              href="#"
+              download="panelExtreme.zip">
+
+              ⬇ Download ZIP File
+
+            </a>
+
+            <p class="note">
+              The ZIP download appears automatically after admin approval.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <p class="note">
+          Replace the WhatsApp number in the script with your seller number before publishing the website.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+<!-- FAQ -->
+<section id="faq">
+
+  <div class="container faq">
+
+    <div class="section-title">
+      <h2>Frequently Asked Questions</h2>
+      <p>Everything you need to know before placing your order.</p>
+    </div>
+
+    <details open>
+      <summary>🛒 How do I receive my order?</summary>
+      <p>
+        First, select your preferred package and complete the payment.
+        Submit your transaction/reference ID for verification. Once your
+        payment is approved by our team, your download option will appear
+        automatically on this page.
+      </p>
+    </details>
+
+    <details>
+      <summary>📱 Which devices are supported?</summary>
+      <p>
+        The panel is available for supported Mobile and PC devices.
+        Please make sure your device meets the requirements shown in the
+        product information before purchasing.
+      </p>
+    </details>
+
+    <details>
+      <summary>💰 Is there a refund or replacement?</summary>
+      <p>
+        Please contact our support team before making a purchase if you have
+        any questions about compatibility or package details. Refund or
+        replacement requests are handled according to the applicable
+        purchase and service policy.
+      </p>
+    </details>
+
+    <details>
+      <summary>🎧 Can I get help with setup?</summary>
+      <p>
+        Yes. Setup assistance is available for customers. If you face any
+        issue during installation or setup, contact our support team with
+        your order information and we will guide you through the process.
+      </p>
+    </details>
+
+    <details>
+      <summary>⚡ How long does payment verification take?</summary>
+      <p>
+        After submitting your payment information, please keep this page
+        open while your order is being reviewed. You will see the download
+        option automatically after admin approval.
+      </p>
+    </details>
+
+  </div>
+
+</section>
+
+
+<!-- PREMIUM FOOTER -->
+<footer>
+
+  <div class="container">
+
+    <div style="
+      max-width:850px;
+      margin:auto;
+      padding:10px 0;
+    ">
+
+      <div style="
+        font-size:24px;
+        font-weight:900;
+        letter-spacing:1px;
+        margin-bottom:8px;
+      ">
+        FREE <span style="color:var(--yellow)">FIRE</span> PANEL
+      </div>
+
+      <p style="
+        color:#a8adbd;
+        max-width:600px;
+        margin:0 auto 18px;
+        font-size:14px;
+      ">
+        Premium panel packages with fast delivery,
+        secure checkout and customer support.
+      </p>
+
+      <div style="
+        display:flex;
+        justify-content:center;
+        gap:10px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
+      ">
+
+        <a
+          href="#plans"
+          class="btn btn-outline"
+          style="padding:9px 15px;font-size:13px;">
+          📦 View Plans
+        </a>
+
+        <a
+          href="#order"
+          class="btn btn-yellow"
+          style="padding:9px 15px;font-size:13px;">
+          🛒 Order Now
+        </a>
+
+        <a
+          href="https://wa.me/8801311282081"
+          target="_blank"
+          rel="noopener"
+          class="btn btn-outline"
+          style="padding:9px 15px;font-size:13px;">
+          💬 WhatsApp Support
+        </a>
+
+      </div>
+
+      <div style="
+        height:1px;
+        background:var(--line);
+        margin:20px 0;
+      "></div>
+
+      <div style="
+        color:#777;
+        font-size:13px;
+        line-height:1.7;
+      ">
+
+        <div>
+          © 2026 <strong style="color:#aaa">Free Fire Panel Store</strong>.
+          All rights reserved.
+        </div>
+
+        <div style="margin-top:5px;">
+          Free Fire is a trademark of Garena.
+          This storefront is an independent service and is not affiliated
+          with or endorsed by Garena.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</footer>
+
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================== -->
+  <script>
+
+    /* =========================
+       SUPABASE CONFIG
+    ========================== */
+
+    const SUPABASE_URL =
+      'https://gfeqsvefeifltjhxswor.supabase.co';
+
+    const SUPABASE_KEY =
+      'sb_publishable_Ibe-v4hrhD6Cb2ggYCwdnQ_uglELvkK';
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+
+    /* =========================
+       ELEMENTS
+    ========================== */
+
+    const buttons =
+      document.querySelectorAll('.order-btn');
+
+    const planSelect =
+      document.getElementById('plan');
+
+    const form =
+      document.getElementById('orderForm');
+
+    const paymentBox =
+      document.getElementById('paymentBox');
+
+    const payOrderId =
+      document.getElementById('payOrderId');
+
+    const payAmount =
+      document.getElementById('payAmount');
+
+    const paymentInfo =
+      document.getElementById('paymentInfo');
+
+    const paymentNumber =
+      document.getElementById('paymentNumber');
+
+    const paymentTitle =
+      document.getElementById('paymentTitle');
+
+    const copyPayment =
+      document.getElementById('copyPayment');
+
+    const verifyBox =
+      document.getElementById('verifyBox');
+
+    const verifyBtn =
+      document.getElementById('verifyBtn');
+
+    const verifyStatus =
+      document.getElementById('verifyStatus');
+
+    const waitingBox =
+      document.getElementById('waitingBox');
+
+    const waitingTimer =
+      document.getElementById('waitingTimer');
+
+    const downloadBox =
+      document.getElementById('downloadBox');
+
+    const downloadBtn =
+      document.getElementById('downloadBtn');
+
+
+    /* =========================
+       PAYMENT ACCOUNTS
+    ========================== */
+
+    const paymentAccounts = {
+
+      'bKash':
+        '01311282081',
+
+      'Nagad':
+        '01311282081',
+
+      'Rocket':
+        '01311282081',
+
+      'Upay':
+        '01311282081',
+
+      'USDT BEP20':
+        '0x3c92727fd877c1ef6aac85c1576630918f6b5ef5'
+
+    };
+
+
+    /* =========================
+       PRICES
+    ========================== */
+
+    const prices = {
+
+      '1 Month — ৳99':
+        '৳99',
+
+      '1 Month Premium — ৳199':
+        '৳199',
+
+      '2 Month Premium — ৳299':
+        '৳299',
+
+      '6 Month — ৳599':
+        '৳599',
+
+      'Lifetime Premium — ৳999':
+        '৳999'
+
+    };
+
+
+    /* =========================
+       NUMERIC AMOUNTS
+    ========================== */
+
+    const amounts = {
+
+      '1 Month — ৳99':
+        99,
+
+      '1 Month Premium — ৳199':
+        199,
+
+      '2 Month Premium — ৳299':
+        299,
+
+      '6 Month — ৳599':
+        599,
+
+      'Lifetime Premium — ৳999':
+        999
+
+    };
+
+
+    /* =========================
+       STATE
+    ========================== */
+
+    let currentOrder = null;
+
+    let selectedMethod = '';
+
+    let waitingInterval = null;
+
+    let approvalInterval = null;
+
+
+    /* =========================
+       LOCAL STORAGE
+    ========================== */
+
+    function getOrders(){
+
+      try{
+
+        return JSON.parse(
+          localStorage.getItem('ffp_orders') || '[]'
+        );
+
+      }catch(error){
+
+        console.error(
+          'Local storage read failed:',
+          error
+        );
+
+        return [];
+
+      }
+
+    }
+
+
+    function saveOrders(orders){
+
+      try{
+
+        localStorage.setItem(
+          'ffp_orders',
+          JSON.stringify(orders)
+        );
+
+      }catch(error){
+
+        console.error(
+          'Local storage save failed:',
+          error
+        );
+
+      }
+
+    }
+
+
+    /* =========================
+       PLAN BUTTONS
+    ========================== */
+
+    buttons.forEach(function(btn){
+
+      btn.addEventListener(
+        'click',
+        function(){
+
+          const selectedPlan =
+            btn.getAttribute('data-plan');
+
+          if(selectedPlan){
+
+            planSelect.value =
+              selectedPlan;
+
+          }
+
+        }
+      );
+
+    });
+
+
+    /* =========================
+       CREATE ORDER
+    ========================== */
+
+    form.addEventListener(
+      'submit',
+      async function(event){
+
+        event.preventDefault();
+
+
+        const plan =
+          planSelect.value;
+
+        const name =
+          document
+            .getElementById('name')
+            .value
+            .trim();
+
+        const contact =
+          document
+            .getElementById('contact')
+            .value
+            .trim();
+
+        const email =
+          document
+            .getElementById('email')
+            .value
+            .trim();
+
+        const note =
+          document
+            .getElementById('noteInput')
+            .value
+            .trim();
+
+
+        if(!plan){
+
+          alert(
+            'Please select a package.'
+          );
+
+          return;
+
+        }
+
+
+        if(!name){
+
+          alert(
+            'Please enter your name.'
+          );
+
+          return;
+
+        }
+
+
+        if(!contact){
+
+          alert(
+            'Please enter your WhatsApp / Contact.'
+          );
+
+          return;
+
+        }
+
+
+        currentOrder = {
+
+          orderId:
+            'FFP-' +
+            Date.now()
+              .toString()
+              .slice(-8),
+
+          plan:
+            plan,
+
+          name:
+            name,
+
+          contact:
+            contact,
+
+          email:
+            email,
+
+          note:
+            note,
+
+          amount:
+            prices[plan] || '',
+
+          paymentMethod:
+            '',
+
+          transactionId:
+            '',
+
+          payer:
+            '',
+
+          status:
+            'ORDER CREATED',
+
+          createdAt:
+            new Date().toLocaleString()
+
+        };
+
+
+        /* Show payment information */
+
+        payOrderId.textContent =
+          currentOrder.orderId;
+
+        payAmount.textContent =
+          currentOrder.amount;
+
+
+        paymentBox.style.display =
+          'block';
+
+
+        verifyStatus.style.display =
+          'none';
+
+        verifyStatus.innerHTML =
+          '';
+
+
+        downloadBox.classList.remove(
+          'show'
+        );
+
+
+        waitingBox.style.display =
+          'none';
+
+
+        /* Reset payment selection */
+
+        selectedMethod = '';
+
+        paymentInfo.classList.remove(
+          'show'
+        );
+
+        verifyBox.classList.remove(
+          'show'
+        );
+
+
+        document
+          .querySelectorAll('.pay-method')
+          .forEach(function(method){
+
+            method.classList.remove(
+              'active'
+            );
+
+          });
+
+
+        paymentTitle.textContent =
+          'Payment account';
+
+        paymentNumber.textContent =
+          'Select a method';
+
+
+        /*
+         * Scroll to payment section
+         */
+
+        setTimeout(function(){
+
+          paymentBox.scrollIntoView({
+
+            behavior:'smooth',
+
+            block:'center'
+
+          });
+
+        },100);
+
+      }
+    );
+
+
+    /* =========================
+       PAYMENT METHOD
+    ========================== */
+
+    document
+      .querySelectorAll('.pay-method')
+      .forEach(function(btn){
+
+        btn.addEventListener(
+          'click',
+          function(){
+
+            document
+              .querySelectorAll('.pay-method')
+              .forEach(function(item){
+
+                item.classList.remove(
+                  'active'
+                );
+
+              });
+
+
+            btn.classList.add(
+              'active'
+            );
+
+
+            selectedMethod =
+              btn.getAttribute(
+                'data-method'
+              );
+
+
+            paymentTitle.textContent =
+              selectedMethod +
+              ' payment account';
+
+
+            paymentNumber.textContent =
+              paymentAccounts[
+                selectedMethod
+              ] || '';
+
+
+            paymentInfo.classList.add(
+              'show'
+            );
+
+
+            verifyBox.classList.add(
+              'show'
+            );
+
+          }
+        );
+
+      });
+
+
+    /* =========================
+       COPY PAYMENT ACCOUNT
+    ========================== */
+
+    copyPayment.addEventListener(
+      'click',
+      async function(){
+
+        const value =
+          paymentNumber.textContent.trim();
+
+
+        if(!value ||
+           value === 'Select a method'){
+
+          alert(
+            'Please select a payment method first.'
+          );
+
+          return;
+
+        }
+
+
+        try{
+
+          await navigator.clipboard.writeText(
+            value
+          );
+
+          copyPayment.textContent =
+            'Copied ✓';
+
+
+          setTimeout(function(){
+
+            copyPayment.textContent =
+              'Copy';
+
+          },1200);
+
+
+        }catch(error){
+
+          alert(
+            'Please copy the payment address manually.'
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       SHOW APPROVED DOWNLOAD
+    ========================== */
+
+    function showApprovedDownload(order){
+
+      if(!order){
+
+        return;
+
+      }
+
+
+      if(waitingBox){
+
+        waitingBox.style.display =
+          'none';
+
+      }
+
+
+      if(waitingInterval){
+
+        clearInterval(
+          waitingInterval
+        );
+
+        waitingInterval =
+          null;
+
+      }
+
+
+      if(approvalInterval){
+
+        clearInterval(
+          approvalInterval
+        );
+
+        approvalInterval =
+          null;
+
+      }
+
+
+      downloadBox.classList.add(
+        'show'
+      );
+
+
+      downloadBtn.href =
+  'panel-package.zip';
+
+
+      downloadBtn.download =
+        'panel-package.zip';
+
+
+      downloadBtn.textContent =
+        '⬇ Download ZIP File';
+
+
+      verifyStatus.style.display =
+        'block';
+
+
+      verifyStatus.innerHTML =
+        '<span class="status" style="border-color:#426f4c;color:#7dff9a">APPROVED ✓ — ZIP FILE IS READY</span>';
+
+    }
+
+
+    /* =========================
+       CHECK ORDER APPROVAL
+    ========================== */
+
+    async function checkApproval(){
+
+      if(!currentOrder){
+        return;
+      }
+
+      try{
+        /* First try the simple/legacy schema: status */
+        let result = await supabaseClient
+          .from('orders')
+          .select('status')
+          .eq('order_id', currentOrder.orderId)
+          .maybeSingle();
+
+        let status = null;
+
+        if(!result.error && result.data){
+          status = result.data.status;
+        }else{
+          /* Fallback for a table using order_status */
+          result = await supabaseClient
+            .from('orders')
+            .select('order_status')
+            .eq('order_id', currentOrder.orderId)
+            .maybeSingle();
+
+          if(!result.error && result.data){
+            status = result.data.order_status;
+          }
+        }
+
+        if(!status){
+          return;
+        }
+
+        status = String(status).trim().toUpperCase();
+
+        if(status === 'APPROVED'){
+          currentOrder.status = 'APPROVED — READY FOR DELIVERY';
+          showApprovedDownload(currentOrder);
+          return;
+        }
+
+        if(status === 'REJECTED'){
+          currentOrder.status = 'REJECTED';
+
+          if(waitingBox){
+            waitingBox.style.display = 'none';
+          }
+
+          if(waitingInterval){
+            clearInterval(waitingInterval);
+            waitingInterval = null;
+          }
+
+          if(approvalInterval){
+            clearInterval(approvalInterval);
+            approvalInterval = null;
+          }
+
+          downloadBox.classList.remove('show');
+          verifyStatus.style.display = 'block';
+          verifyStatus.innerHTML =
+            '<span class="status" style="border-color:#6f4242;color:#ff8f8f">REJECTED — PLEASE CONTACT SUPPORT</span>';
+        }
+
+      }catch(error){
+        console.error('Approval check error:', error);
+      }
+    }
+
+    /* =========================
+       START APPROVAL CHECKING
+    ========================== */
+
+    function startApprovalChecking(){
+
+      if(approvalInterval){
+
+        clearInterval(
+          approvalInterval
+        );
+
+      }
+
+
+      approvalInterval =
+        setInterval(
+          checkApproval,
+          3000
+        );
+
+
+      checkApproval();
+
+    }
+
+
+    /* =========================
+       PAYMENT VERIFICATION
+    ========================== */
+
+    verifyBtn.addEventListener(
+      'click',
+      async function(){
+
+        if(!currentOrder){
+
+          alert(
+            'Please create an order first.'
+          );
+
+          return;
+
+        }
+
+
+        const txn =
+          document
+            .getElementById('transactionId')
+            .value
+            .trim();
+
+
+        const payer =
+          document
+            .getElementById('payer')
+            .value
+            .trim();
+
+
+        if(!selectedMethod){
+
+          alert(
+            'Please select a payment method.'
+          );
+
+          return;
+
+        }
+
+
+        if(!txn){
+
+          alert(
+            'Please enter the transaction/reference ID.'
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * Prevent accidental double submit
+         */
+
+        verifyBtn.disabled =
+          true;
+
+        verifyBtn.textContent =
+          'Submitting...';
+
+
+        currentOrder.paymentMethod =
+          selectedMethod;
+
+        currentOrder.transactionId =
+          txn;
+
+        currentOrder.payer =
+          payer;
+
+        currentOrder.status =
+          'PAYMENT SUBMITTED — PENDING ADMIN APPROVAL';
+
+
+        try{
+
+          /*
+           * INSERT ORDER INTO SUPABASE
+           * Supports both the newer schema and the original schema.
+           */
+          let result = await supabaseClient
+            .from('orders')
+            .insert([
+              {
+                order_id: currentOrder.orderId,
+                package_name: currentOrder.plan,
+                amount: currentOrder.amount || 0,
+                customer_name: currentOrder.name,
+                contact: currentOrder.contact,
+                email: currentOrder.email || null,
+                note: currentOrder.note || null,
+                payment_method: currentOrder.paymentMethod,
+                transaction_id: currentOrder.transactionId,
+                payer_number: currentOrder.payer || null,
+                status: 'PENDING'
+              }
+            ]);
+
+          /*
+           * If the table does not have email/note in this form,
+           * retry using the original table structure where email
+           * is stored in the old uid column.
+           */
+          if(result.error){
+            console.warn('Primary insert failed, trying legacy schema:', result.error.message);
+
+            result = await supabaseClient
+              .from('orders')
+              .insert([
+                {
+                  order_id: currentOrder.orderId,
+                  package_name: currentOrder.plan,
+                  amount: currentOrder.amount || 0,
+                  customer_name: currentOrder.name,
+                  contact: currentOrder.contact,
+                  uid: currentOrder.email || null,
+                  note: currentOrder.note || null,
+                  payment_method: currentOrder.paymentMethod,
+                  transaction_id: currentOrder.transactionId,
+                  payer_number: currentOrder.payer || null,
+                  status: 'PENDING'
+                }
+              ]);
+          }
+
+          if(result.error){
+
+            console.error(
+              result.error
+            );
+
+            alert(
+              'Order submit failed: ' +
+              result.error.message
+            );
+
+            verifyBtn.disabled =
+              false;
+
+            verifyBtn.textContent =
+              '✓ Submit Payment Verification';
+
+            return;
+
+          }
+
+
+          /*
+           * Save local copy
+           */
+
+          const orders =
+            getOrders();
+
+
+          orders.unshift(
+            currentOrder
+          );
+
+
+          saveOrders(
+            orders
+          );
+
+
+          /*
+           * SUCCESS MESSAGE
+           */
+
+          verifyStatus.style.display =
+            'block';
+
+
+          verifyStatus.innerHTML =
+            '<span class="status">SUBMITTED ✓ — ORDER SENT FOR VERIFICATION</span>';
+
+
+          /*
+           * Show waiting box
+           */
+
+          waitingBox.style.display =
+            'block';
+
+
+          let remaining =
+            300;
+
+
+          waitingTimer.textContent =
+            '05:00';
+
+
+          if(waitingInterval){
+
+            clearInterval(
+              waitingInterval
+            );
+
+          }
+
+
+          waitingInterval =
+            setInterval(
+              function(){
+
+                /*
+                 * Check admin approval
+                 */
+
+                checkApproval();
+
+
+                remaining--;
+
+
+                if(remaining <= 0){
+
+                  clearInterval(
+                    waitingInterval
+                  );
+
+                  waitingInterval =
+                    null;
+
+                  waitingTimer.textContent =
+                    'Verification time completed';
+
+                  return;
+
+                }
+
+
+                const minutes =
+                  String(
+                    Math.floor(
+                      remaining / 60
+                    )
+                  ).padStart(
+                    2,
+                    '0'
+                  );
+
+
+                const seconds =
+                  String(
+                    remaining % 60
+                  ).padStart(
+                    2,
+                    '0'
+                  );
+
+
+                waitingTimer.textContent =
+                  minutes +
+                  ':' +
+                  seconds;
+
+              },
+              1000
+            );
+
+
+          /*
+           * Separate approval checker
+           */
+
+          startApprovalChecking();
+
+
+          /*
+           * Scroll to waiting box
+           */
+
+          waitingBox.scrollIntoView({
+
+            behavior:'smooth',
+
+            block:'center'
+
+          });
+
+
+        }catch(error){
+
+          console.error(
+            'Payment verification error:',
+            error
+          );
+
+
+          alert(
+            'Something went wrong. Please try again.'
+          );
+
+
+        }finally{
+
+          verifyBtn.disabled =
+            false;
+
+          verifyBtn.textContent =
+            '✓ Submit Payment Verification';
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       PAGE VISIBILITY
+    ========================== */
+
+    document.addEventListener(
+      'visibilitychange',
+      function(){
+
+        if(!document.hidden){
+
+          checkApproval();
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       STORAGE EVENT
+    ========================== */
+
+    window.addEventListener(
+      'storage',
+      function(){
+
+        checkApproval();
+
+      }
+    );
+
+
+    /* =========================
+       DEBUG MESSAGE
+    ========================== */
+
+    console.log(
+      'Free Fire Panel Store loaded successfully.'
+    );
+
+  </script>
+
+</body>
+</html>
