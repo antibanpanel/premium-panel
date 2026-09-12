@@ -1707,46 +1707,95 @@
        CREATE ORDER
     ========================== */
 
-    form.addEventListener(
-      'submit',
-      async function(event){
+    form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-        event.preventDefault();
+  const submitBtn = form.querySelector('button[type="submit"]');
 
+  const customerName = document.getElementById('customerName').value.trim();
+  const contact = document.getElementById('contact').value.trim();
+  const email = document.getElementById('email').value.trim();
 
-        const plan =
-          planSelect.value;
+  const packageName = selectedPackage
+    ? selectedPackage.name
+    : document.getElementById('packageName')?.value || '';
 
-        const name =
-          document
-            .getElementById('name')
-            .value
-            .trim();
+  const amount = selectedPackage
+    ? selectedPackage.price
+    : document.getElementById('amount')?.value || 0;
 
-        const contact =
-          document
-            .getElementById('contact')
-            .value
-            .trim();
+  if (!customerName || !contact || !email) {
+    alert('Please fill all required fields.');
+    return;
+  }
 
-        const email =
-          document
-            .getElementById('email')
-            .value
-            .trim();
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Creating Order...';
 
-        const note =
-          document
-            .getElementById('noteInput')
-            .value
-            .trim();
+  const orderId =
+    'FF-' +
+    Date.now().toString(36).toUpperCase() +
+    Math.random().toString(36).substring(2, 6).toUpperCase();
 
+  try {
+    let result = await supabaseClient
+      .from('orders')
+      .insert([{
+        order_id: orderId,
+        customer_name: customerName,
+        contact: contact,
+        email: email,
+        package_name: packageName,
+        amount: amount,
+        status: 'PENDING'
+      }])
+      .select()
+      .single();
 
-        if(!plan){
+    // পুরোনো table হলে email-এর বদলে uid ব্যবহার করবে
+    if (result.error) {
+      result = await supabaseClient
+        .from('orders')
+        .insert([{
+          order_id: orderId,
+          customer_name: customerName,
+          contact: contact,
+          uid: email,
+          package_name: packageName,
+          amount: amount,
+          status: 'PENDING'
+        }])
+        .select()
+        .single();
+    }
 
-          alert(
-            'Please select a package.'
-          );
+    if (result.error) {
+      console.error(result.error);
+      alert('Order create failed: ' + result.error.message);
+      return;
+    }
+
+    // Order তৈরি সফল
+    document.getElementById('payOrderId').textContent = orderId;
+    document.getElementById('payAmount').textContent = '৳' + amount;
+
+    document.getElementById('paymentBox').style.display = 'block';
+
+    // Payment methods দেখাবে
+    document.querySelector('.payment-box').scrollIntoView({
+      behavior: 'smooth'
+    });
+
+    alert('Order created successfully!');
+
+  } catch (error) {
+    console.error(error);
+    alert('Something went wrong. Please try again.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Create Order';
+  }
+});
 
           return;
 
