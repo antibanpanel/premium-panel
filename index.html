@@ -1,2626 +1,2154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Free Fire Panel Store</title>
-  <meta name="description" content="Free Fire Panel Store - plans, features, pricing and support.">
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    :root{
-      --bg:#07080d;
-      --card:#11131b;
-      --card2:#171a24;
-      --red:#ff1744;
-      --yellow:#ffd600;
-      --text:#fff;
-      --muted:#a8adbd;
-      --line:#282c3a;
-    }
-
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
-
-    body{
-      font-family:Inter,Arial,sans-serif;
-      background:
-        radial-gradient(circle at 15% 5%,#32101c 0,transparent 28%),
-        radial-gradient(circle at 85% 10%,#1c1d42 0,transparent 30%),
-        var(--bg);
-      color:var(--text);
-      line-height:1.5;
-    }
-
-    a{
-      text-decoration:none;
-      color:inherit;
-    }
-
-    button,
-    input,
-    select,
-    textarea{
-      font:inherit;
-    }
-
-    .container{
-      width:min(1120px,92%);
-      margin:auto;
-    }
-
-    nav{
-      position:sticky;
-      top:0;
-      z-index:20;
-      background:rgba(7,8,13,.86);
-      backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--line);
-    }
-
-    .nav{
-      height:70px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-    }
-
-    .logo{
-      font-size:22px;
-      font-weight:900;
-      letter-spacing:.5px;
-    }
-
-    .logo span{
-      color:var(--yellow);
-    }
-
-    .navlinks{
-      display:flex;
-      gap:24px;
-      color:#ddd;
-    }
-
-    .navlinks a:hover{
-      color:var(--yellow);
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:13px 22px;
-      border-radius:12px;
-      font-weight:800;
-      border:1px solid transparent;
-      cursor:pointer;
-    }
-
-    .btn-red{
-      background:linear-gradient(135deg,#ff1744,#c5002d);
-      box-shadow:0 10px 30px #ff17442e;
-    }
-
-    .btn-yellow{
-      background:var(--yellow);
-      color:#111;
-    }
-
-    .btn-outline{
-      border-color:#45495a;
-      background:#11131b;
-    }
-
-    .hero{
-      padding:90px 0 60px;
-      text-align:center;
-    }
-
-    .badge{
-      display:inline-block;
-      padding:7px 13px;
-      border:1px solid #4c4250;
-      border-radius:99px;
-      color:var(--yellow);
-      background:#171019;
-      font-weight:800;
-      font-size:13px;
-    }
-
-    h1{
-      font-size:clamp(44px,8vw,86px);
-      line-height:.95;
-      margin:22px 0 20px;
-      text-transform:uppercase;
-    }
-
-    h1 span{
-      color:var(--yellow);
-      text-shadow:0 0 30px #ffd60033;
-    }
-
-    .hero p{
-      max-width:720px;
-      margin:auto;
-      color:var(--muted);
-      font-size:18px;
-    }
-
-    .actions{
-      margin-top:28px;
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin:45px 0;
-    }
-
-    .stat{
-      background:linear-gradient(145deg,#151822,#0d0f15);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:22px;
-      text-align:center;
-    }
-
-    .stat b{
-      display:block;
-      font-size:25px;
-      color:var(--yellow);
-    }
-
-    .stat small{
-      color:var(--muted);
-    }
-
-    section{
-      padding:55px 0;
-    }
-
-    .section-title{
-      text-align:center;
-      margin-bottom:35px;
-    }
-
-    .section-title h2{
-      font-size:36px;
-    }
-
-    .section-title p{
-      color:var(--muted);
-      margin-top:8px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
-    }
-
-    .card{
-      background:linear-gradient(145deg,#141720,#0d0f15);
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:26px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .card.popular{
-      border-color:#ff1744;
-      box-shadow:0 0 35px #ff174414;
-    }
-
-    .ribbon{
-      position:absolute;
-      right:15px;
-      top:15px;
-      background:var(--red);
-      padding:5px 10px;
-      border-radius:99px;
-      font-size:11px;
-      font-weight:900;
-    }
-
-    .price{
-      font-size:40px;
-      font-weight:900;
-      margin:16px 0;
-    }
-
-    .price small{
-      font-size:14px;
-      color:var(--muted);
-    }
-
-    .features{
-      list-style:none;
-      margin:20px 0;
-    }
-
-    .features li{
-      padding:9px 0;
-      border-bottom:1px solid #242733;
-      color:#ddd;
-    }
-
-    .features li::before{
-      content:"✓";
-      color:var(--yellow);
-      font-weight:900;
-      margin-right:9px;
-    }
-
-    .card .btn{
-      width:100%;
-    }
-
-    .feature-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:15px;
-    }
-
-    .feature{
-      padding:22px;
-      border:1px solid var(--line);
-      border-radius:17px;
-      background:#10121a;
-    }
-
-    .icon{
-      font-size:28px;
-      margin-bottom:10px;
-    }
-
-    .feature h3{
-      font-size:17px;
-    }
-
-    .feature p{
-      color:var(--muted);
-      font-size:14px;
-      margin-top:6px;
-    }
-
-    .faq{
-      max-width:820px;
-      margin:auto;
-    }
-
-    details{
-      background:#11131b;
-      border:1px solid var(--line);
-      border-radius:14px;
-      margin:10px 0;
-      padding:17px;
-    }
-
-    summary{
-      cursor:pointer;
-      font-weight:800;
-    }
-
-    details p{
-      color:var(--muted);
-      padding-top:12px;
-    }
-
-    .order{
-      background:linear-gradient(135deg,#220914,#15101a);
-      border:1px solid #5a1d2d;
-      border-radius:24px;
-      padding:40px;
-      text-align:center;
-    }
-
-    footer{
-      border-top:1px solid var(--line);
-      padding:30px 0;
-      color:var(--muted);
-      text-align:center;
-    }
-
-    .note{
-      font-size:12px;
-      color:#777;
-      margin-top:18px;
-    }
-
-    .order-form{
-      max-width:760px;
-      margin:28px auto 0;
-      text-align:left;
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:7px;
-    }
-
-    .field.full{
-      grid-column:1/-1;
-    }
-
-    .field label{
-      font-size:13px;
-      font-weight:800;
-      color:#ddd;
-    }
-
-    .field input,
-    .field select,
-    .field textarea{
-      width:100%;
-      padding:13px 14px;
-      border-radius:11px;
-      border:1px solid #343847;
-      background:#0b0d13;
-      color:#fff;
-      outline:none;
-    }
-
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus{
-      border-color:#ffd600;
-    }
-
-    .field textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    .payment-box{
-      max-width:760px;
-      margin:24px auto 0;
-      text-align:left;
-    }
-
-    .payment-methods{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:9px;
-      margin:15px 0;
-    }
-
-    .pay-method{
-      padding:12px 7px;
-      border:1px solid #343847;
-      border-radius:11px;
-      background:#0b0d13;
-      color:#ddd;
-      text-align:center;
-      font-weight:800;
-      cursor:pointer;
-    }
-
-    .pay-method.active{
-      border-color:var(--yellow);
-      color:var(--yellow);
-      box-shadow:0 0 18px #ffd60018;
-    }
-
-    .payment-info{
-      display:none;
-      background:#0b0d13;
-      border:1px solid #343847;
-      border-radius:14px;
-      padding:18px;
-      margin-top:12px;
-    }
-
-    .payment-info.show{
-      display:block;
-    }
-
-    .payment-number{
-      font-size:21px;
-      font-weight:900;
-      color:var(--yellow);
-      margin:6px 0;
-      word-break:break-all;
-    }
-
-    .copy-btn{
-      padding:7px 10px;
-      border:1px solid #444957;
-      border-radius:8px;
-      background:#171a24;
-      color:#fff;
-      cursor:pointer;
-    }
-
-    .payment-warning{
-      font-size:12px;
-      color:#9da2b2;
-      margin-top:10px;
-    }
-
-    .verify-box{
-      display:none;
-      margin-top:18px;
-      padding-top:18px;
-      border-top:1px solid #292d39;
-    }
-
-    .verify-box.show{
-      display:block;
-    }
-
-    .download-box{
-      display:none;
-      margin-top:18px;
-      padding:18px;
-      border:1px solid #384b3d;
-      background:#0c1510;
-      border-radius:14px;
-    }
-
-    .download-box.show{
-      display:block;
-    }
-
-    .status{
-      display:inline-block;
-      margin-top:8px;
-      padding:5px 9px;
-      border-radius:99px;
-      background:#332900;
-      color:var(--yellow);
-      font-size:12px;
-      font-weight:900;
-    }
-
-    .admin-panel{
-      display:none;
-      max-width:980px;
-      margin:24px auto 0;
-      text-align:left;
-    }
-
-    .admin-login{
-      max-width:430px;
-      margin:0 auto;
-    }
-
-    .admin-table-wrap{
-      overflow-x:auto;
-      margin-top:18px;
-    }
-
-    .admin-table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:760px;
-    }
-
-    .admin-table th,
-    .admin-table td{
-      padding:11px;
-      border-bottom:1px solid #292d39;
-      text-align:left;
-      font-size:13px;
-    }
-
-    .admin-table th{
-      color:var(--yellow);
-    }
-
-    .order-row{
-      background:#0c0e14;
-    }
-
-    .admin-actions{
-      display:flex;
-      gap:7px;
-      flex-wrap:wrap;
-    }
-
-    .small-btn{
-      padding:7px 10px;
-      border-radius:8px;
-      border:1px solid #3d4251;
-      background:#171a24;
-      color:#fff;
-      cursor:pointer;
-      font-weight:700;
-    }
-
-    .small-btn.approve{
-      border-color:#426f4c;
-    }
-
-    .small-btn.reject{
-      border-color:#6f4242;
-    }
-
-    .admin-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:15px;
-      flex-wrap:wrap;
-    }
-
-    .admin-stat{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    @media(max-width:800px){
-      .navlinks{
-        display:none;
-      }
-
-      .stats,
-      .grid,
-      .feature-grid{
-        grid-template-columns:1fr 1fr;
-      }
-    }
-
-    @media(max-width:700px){
-      .payment-methods{
-        grid-template-columns:repeat(3,1fr);
-      }
-    }
-
-    @media(max-width:520px){
-      .stats,
-      .grid,
-      .feature-grid{
-        grid-template-columns:1fr;
-      }
-
-      .hero{
-        padding-top:60px;
-      }
-
-      .order{
-        padding:28px 18px;
-      }
-
-      .form-grid{
-        grid-template-columns:1fr;
-      }
-
-      .field.full{
-        grid-column:auto;
-      }
-
-      .payment-methods{
-        grid-template-columns:repeat(2,1fr);
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Free Fire Panel Store</title>
+<meta name="description" content="Premium digital product store">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#07080d;
+  --card:#11131b;
+  --card2:#171a24;
+  --red:#ff1744;
+  --yellow:#ffd600;
+  --text:#fff;
+  --muted:#a8adbd;
+  --line:#282c3a;
+  --green:#67ff8b;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at 15% 5%,#32101c 0,transparent 28%),
+    radial-gradient(circle at 85% 10%,#1c1d42 0,transparent 30%),
+    var(--bg);
+  color:var(--text);
+  line-height:1.5;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+.container{
+  width:min(1120px,92%);
+  margin:auto;
+}
+
+nav{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(7,8,13,.9);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid var(--line);
+}
+
+.nav{
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:900;
+}
+
+.logo span{
+  color:var(--yellow);
+}
+
+.navlinks{
+  display:flex;
+  gap:25px;
+}
+
+.navlinks a{
+  color:#ddd;
+}
+
+.navlinks a:hover{
+  color:var(--yellow);
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:13px 22px;
+  border-radius:12px;
+  border:0;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.btn-red{
+  background:linear-gradient(135deg,#ff1744,#c5002d);
+  color:white;
+  box-shadow:0 10px 30px #ff17442e;
+}
+
+.btn-yellow{
+  background:var(--yellow);
+  color:#111;
+}
+
+.btn-outline{
+  background:#11131b;
+  border:1px solid #45495a;
+  color:#fff;
+}
+
+.hero{
+  padding:90px 0 60px;
+  text-align:center;
+}
+
+.badge{
+  display:inline-block;
+  padding:7px 14px;
+  border:1px solid #4c4250;
+  border-radius:99px;
+  color:var(--yellow);
+  background:#171019;
+  font-weight:800;
+  font-size:13px;
+}
+
+h1{
+  font-size:clamp(44px,8vw,86px);
+  line-height:.95;
+  margin:22px 0;
+  text-transform:uppercase;
+}
+
+h1 span{
+  color:var(--yellow);
+}
+
+.hero p{
+  max-width:720px;
+  margin:auto;
+  color:var(--muted);
+  font-size:18px;
+}
+
+.actions{
+  margin-top:28px;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin:45px 0;
+}
+
+.stat{
+  background:linear-gradient(145deg,#151822,#0d0f15);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:22px;
+  text-align:center;
+}
+
+.stat b{
+  display:block;
+  font-size:25px;
+  color:var(--yellow);
+}
+
+.stat small{
+  color:var(--muted);
+}
+
+section{
+  padding:55px 0;
+}
+
+.section-title{
+  text-align:center;
+  margin-bottom:35px;
+}
+
+.section-title h2{
+  font-size:36px;
+}
+
+.section-title p{
+  color:var(--muted);
+  margin-top:8px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.card{
+  background:linear-gradient(145deg,#141720,#0d0f15);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:26px;
+  position:relative;
+  overflow:hidden;
+}
+
+.card.popular{
+  border-color:var(--red);
+  box-shadow:0 0 35px #ff174414;
+}
+
+.ribbon{
+  position:absolute;
+  right:15px;
+  top:15px;
+  background:var(--red);
+  padding:5px 10px;
+  border-radius:99px;
+  font-size:11px;
+  font-weight:900;
+}
+
+.price{
+  font-size:40px;
+  font-weight:900;
+  margin:16px 0;
+}
+
+.price small{
+  font-size:14px;
+  color:var(--muted);
+}
+
+.features{
+  list-style:none;
+  margin:20px 0;
+}
+
+.features li{
+  padding:9px 0;
+  border-bottom:1px solid #242733;
+  color:#ddd;
+}
+
+.features li::before{
+  content:"✓";
+  color:var(--yellow);
+  font-weight:900;
+  margin-right:9px;
+}
+
+.card .btn{
+  width:100%;
+}
+
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+
+.feature{
+  padding:22px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:#10121a;
+}
+
+.icon{
+  font-size:28px;
+  margin-bottom:10px;
+}
+
+.feature h3{
+  font-size:17px;
+}
+
+.feature p{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:6px;
+}
+
+.order{
+  background:linear-gradient(135deg,#220914,#15101a);
+  border:1px solid #5a1d2d;
+  border-radius:24px;
+  padding:40px;
+}
+
+.order-form{
+  max-width:760px;
+  margin:28px auto 0;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+.field label{
+  font-size:13px;
+  font-weight:800;
+  color:#ddd;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  padding:13px 14px;
+  border-radius:11px;
+  border:1px solid #343847;
+  background:#0b0d13;
+  color:#fff;
+  outline:none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--yellow);
+}
+
+.field textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+.payment-box{
+  max-width:760px;
+  margin:25px auto 0;
+}
+
+.payment-methods{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:9px;
+  margin:15px 0;
+}
+
+.pay-method{
+  padding:12px 5px;
+  border:1px solid #343847;
+  border-radius:11px;
+  background:#0b0d13;
+  color:#ddd;
+  text-align:center;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.pay-method.active{
+  border-color:var(--yellow);
+  color:var(--yellow);
+}
+
+.payment-info{
+  display:none;
+  background:#0b0d13;
+  border:1px solid #343847;
+  border-radius:14px;
+  padding:18px;
+  margin-top:12px;
+}
+
+.payment-info.show{
+  display:block;
+}
+
+.payment-number{
+  font-size:20px;
+  font-weight:900;
+  color:var(--yellow);
+  margin:6px 0;
+  word-break:break-all;
+}
+
+.copy-btn{
+  padding:7px 10px;
+  border:1px solid #444957;
+  border-radius:8px;
+  background:#171a24;
+  color:#fff;
+  cursor:pointer;
+}
+
+.verify-box{
+  display:none;
+  margin-top:20px;
+  padding-top:20px;
+  border-top:1px solid #292d39;
+}
+
+.verify-box.show{
+  display:block;
+}
+
+.waiting-box{
+  display:none;
+  margin-top:20px;
+  padding:25px;
+  text-align:center;
+  background:#0b0d13;
+  border:1px solid #343847;
+  border-radius:15px;
+}
+
+.timer{
+  font-size:38px;
+  font-weight:900;
+  color:var(--yellow);
+  margin:10px;
+}
+
+.download-box{
+  display:none;
+  margin-top:20px;
+  padding:20px;
+  border:1px solid #426f4c;
+  background:#0c1510;
+  border-radius:14px;
+  text-align:center;
+}
+
+.download-box.show{
+  display:block;
+}
+
+.status{
+  display:inline-block;
+  margin-top:8px;
+  padding:7px 12px;
+  border-radius:99px;
+  background:#332900;
+  color:var(--yellow);
+  font-size:12px;
+  font-weight:900;
+}
+
+.faq{
+  max-width:820px;
+  margin:auto;
+}
+
+details{
+  background:#11131b;
+  border:1px solid var(--line);
+  border-radius:14px;
+  margin:10px 0;
+  padding:17px;
+}
+
+summary{
+  cursor:pointer;
+  font-weight:800;
+}
+
+details p{
+  color:var(--muted);
+  padding-top:12px;
+}
+
+.contact-box{
+  text-align:center;
+  padding:35px;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:#10121a;
+}
+
+.contact-box h3{
+  font-size:26px;
+  margin-bottom:10px;
+}
+
+.contact-box p{
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+footer{
+  border-top:1px solid var(--line);
+  padding:30px 0;
+  color:var(--muted);
+  text-align:center;
+}
+
+.note{
+  color:#777;
+  font-size:12px;
+  margin-top:15px;
+}
+
+@media(max-width:800px){
+
+  .navlinks{
+    display:none;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .feature-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .field.full{
+    grid-column:auto;
+  }
+
+  .payment-methods{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .order{
+    padding:25px 18px;
+  }
+}
+
+@media(max-width:500px){
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .feature-grid{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:48px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- NAVIGATION -->
-  <nav>
-    <div class="container nav">
-      <div class="logo">
-        FREE <span>FIRE</span> PANEL
-      </div>
+<nav>
+  <div class="container nav">
 
-      <div class="navlinks">
-        <a href="#plans">Plans</a>
-        <a href="#features">Features</a>
-        <a href="#faq">FAQ</a>
-        <a href="#order">Order</a>
-      </div>
-
-      <a class="btn btn-red" href="#plans">
-        View Plans
-      </a>
+    <div class="logo">
+      Free Fire <span>Panel</span>
     </div>
-  </nav>
 
-
-  <!-- HERO -->
-  <header class="hero container">
-
-    <div class="badge">
-      ⚡ FAST DELIVERY • 24/7 SUPPORT
+    <div class="navlinks">
+      <a href="#plans">Plans</a>
+      <a href="#features">Features</a>
+      <a href="#order">Order</a>
+      <a href="#faq">FAQ</a>
     </div>
+
+    <a
+      class="btn btn-red"
+      href="https://wa.me/8801311282081"
+      target="_blank">
+      WhatsApp
+    </a>
+
+  </div>
+</nav>
+
+
+<header class="hero">
+  <div class="container">
+
+    <span class="badge">
+      PREMIUM DIGITAL PRODUCT STORE
+    </span>
 
     <h1>
-      Premium <span>Panel</span>
+      GET YOUR <span>PANEL</span>
     </h1>
 
     <p>
-      📱 Mobile & PC — দু’টির জন্যই Premium Panel Available<br>
-      🛡️ Enhanced Anti-Ban Protection & Secure Service<br>
-      ⚡ Fast & Smooth Performance
+      Choose your preferred package and place your order.
+      Payment verification is handled manually.
     </p>
-
-    <div style="max-width:900px;margin:30px auto;">
-
-      <iframe
-        src="https://player.vimeo.com/video/1161419468"
-        width="100%"
-        height="500"
-        frameborder="0"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowfullscreen
-        style="border-radius:18px;">
-      </iframe>
-
-    </div>
 
     <div class="actions">
 
-      <a class="btn btn-yellow" href="#plans">
-        See Packages
+      <a href="#plans" class="btn btn-yellow">
+        View Plans
       </a>
 
       <a
-        class="btn btn-outline"
         href="https://wa.me/8801311282081"
         target="_blank"
-        rel="noopener">
-        Contact Seller
+        class="btn btn-outline">
+        Contact Support
       </a>
 
     </div>
+
 
     <div class="stats">
 
       <div class="stat">
         <b>5</b>
-        <small>Plans</small>
+        <small>Available Plans</small>
       </div>
 
       <div class="stat">
         <b>24/7</b>
-        <small>Support</small>
+        <small>Order System</small>
       </div>
 
       <div class="stat">
-        <b>Fast</b>
-        <small>Delivery</small>
+        <b>FAST</b>
+        <small>Verification</small>
       </div>
 
       <div class="stat">
-        <b>Secure</b>
-        <small>Checkout</small>
+        <b>SECURE</b>
+        <small>Payment Check</small>
       </div>
 
     </div>
 
-  </header>
+  </div>
+</header>
 
 
-  <!-- FEATURES -->
-  <section id="features">
+<section id="plans">
 
-    <div class="container">
+<div class="container">
 
-      <div class="section-title">
-        <h2>Panel Details</h2>
-        <p>Everything a customer needs to know before ordering.</p>
-      </div>
+<div class="section-title">
 
-      <div class="feature-grid">
+<h2>Choose Your Plan</h2>
 
-        <div class="feature">
-          <div class="icon">⚡</div>
-          <h3>Quick Setup</h3>
-          <p>
-            Clear setup instructions after purchase.
-          </p>
-        </div>
-
-        <div class="feature">
-          <div class="icon">📱</div>
-          <h3>Device Support</h3>
-          <p>
-            Show the devices/OS versions actually supported by your product.
-          </p>
-        </div>
-
-        <div class="feature">
-          <div class="icon">🛡️</div>
-          <h3>Account Safety</h3>
-          <p>
-            Never promise “100% no ban”; explain real limitations honestly.
-          </p>
-        </div>
-
-        <div class="feature">
-          <div class="icon">🎧</div>
-          <h3>Customer Support</h3>
-          <p>
-            Support channel for setup and product questions.
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- PLANS -->
-  <section id="plans">
-
-    <div class="container">
-
-      <div class="section-title">
-        <h2>Choose Your Plan</h2>
-        <p>Choose the panel package that fits you best.</p>
-      </div>
-
-      <div class="grid">
-
-
-        <!-- PLAN 1 -->
-        <div class="card">
-
-          <h3>1 MONTH</h3>
-
-          <div class="price">
-            ৳99 <small>/ month</small>
-          </div>
-
-          <ul class="features">
-            <li>1-month panel access</li>
-            <li>Setup assistance</li>
-            <li>Customer support</li>
-          </ul>
-
-          <a
-            class="btn btn-outline order-btn"
-            data-plan="1 Month — ৳99"
-            href="#order">
-            Order Now
-          </a>
-
-        </div>
-
-
-        <!-- PLAN 2 -->
-        <div class="card popular">
-
-          <div class="ribbon">
-            PREMIUM
-          </div>
-
-          <h3>1 MONTH PREMIUM</h3>
-
-          <div class="price">
-            ৳199 <small>/ month</small>
-          </div>
-
-          <ul class="features">
-            <li>1-month premium access</li>
-            <li>Priority support</li>
-            <li>Setup assistance</li>
-          </ul>
-
-          <a
-            class="btn btn-red order-btn"
-            data-plan="1 Month Premium — ৳199"
-            href="#order">
-            Order Now
-          </a>
-
-        </div>
-
-
-        <!-- PLAN 3 -->
-        <div class="card">
-
-          <h3>2 MONTH PREMIUM</h3>
-
-          <div class="price">
-            ৳299 <small>/ 2 months</small>
-          </div>
-
-          <ul class="features">
-            <li>2-month premium access</li>
-            <li>Priority support</li>
-            <li>Setup assistance</li>
-          </ul>
-
-          <a
-            class="btn btn-outline order-btn"
-            data-plan="2 Month Premium — ৳299"
-            href="#order">
-            Order Now
-          </a>
-
-        </div>
-
-
-        <!-- PLAN 4 -->
-        <div class="card">
-
-          <h3>6 MONTH</h3>
-
-          <div class="price">
-            ৳599 <small>/ 6 months</small>
-          </div>
-
-          <ul class="features">
-            <li>6-month panel access</li>
-            <li>Priority support</li>
-            <li>Setup assistance</li>
-          </ul>
-
-          <a
-            class="btn btn-outline order-btn"
-            data-plan="6 Month — ৳599"
-            href="#order">
-            Order Now
-          </a>
-
-        </div>
-
-
-        <!-- PLAN 5 -->
-        <div class="card popular">
-
-          <div class="ribbon">
-            BEST VALUE
-          </div>
-
-          <h3>LIFETIME PREMIUM</h3>
-
-          <div class="price">
-            ৳999 <small>/ lifetime</small>
-          </div>
-
-          <ul class="features">
-            <li>Lifetime premium access</li>
-            <li>Priority support</li>
-            <li>Setup assistance</li>
-          </ul>
-
-          <a
-            class="btn btn-red order-btn"
-            data-plan="Lifetime Premium — ৳999"
-            href="#order">
-            Order Now
-          </a>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ORDER -->
-  <section>
-
-    <div class="container">
-
-      <div class="order" id="order">
-
-        <div
-          class="section-title"
-          style="margin-bottom:18px">
-
-          <h2>Place Your Order</h2>
-
-          <p>
-            Fill in the form. Your order ID will be generated automatically.
-          </p>
-
-        </div>
-
-
-        <!-- ORDER FORM -->
-        <form
-          class="order-form"
-          id="orderForm">
-
-          <div class="form-grid">
-
-
-            <div class="field">
-
-              <label for="plan">
-                Select Package *
-              </label>
-
-              <select id="plan" required>
-
-                <option value="">
-                  Choose a package
-                </option>
-
-                <option value="1 Month — ৳99">
-                  1 Month — ৳99
-                </option>
-
-                <option value="1 Month Premium — ৳199">
-                  1 Month Premium — ৳199
-                </option>
-
-                <option value="2 Month Premium — ৳299">
-                  2 Month Premium — ৳299
-                </option>
-
-                <option value="6 Month — ৳599">
-                  6 Month — ৳599
-                </option>
-
-                <option value="Lifetime Premium — ৳999">
-                  Lifetime Premium — ৳999
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="field">
-
-              <label for="name">
-                Customer Name *
-              </label>
-
-              <input
-                id="name"
-                required
-                placeholder="Your name">
-
-            </div>
-
-
-            <div class="field">
-
-              <label for="contact">
-                WhatsApp / Contact *
-              </label>
-
-              <input
-                id="contact"
-                required
-                placeholder="01XXXXXXXXX">
-
-            </div>
-
-
-            <div class="field">
-
-  <label for="uid">
-    Email *
-  </label>
-
-  <input
-    type="email"
-    id="uid"
-    required
-    placeholder="Enter your email">
+<p>Select a package and continue to order.</p>
 
 </div>
 
 
-            <div class="field full">
+<div class="grid">
 
-              <label for="noteInput">
-                Additional Note
-              </label>
 
-              <textarea
-                id="noteInput"
-                placeholder="Any order instructions..."></textarea>
+<!-- PLAN 1 -->
 
-            </div>
+<div class="card">
 
+<h3>1 Month</h3>
 
-            <div class="field full">
+<div class="price">
+৳99
+<small>/ month</small>
+</div>
 
-              <button
-                class="btn btn-red"
-                type="submit">
+<ul class="features">
 
-                🛒 Create Order & Continue
+<li>1 Month Access</li>
+<li>Digital Delivery</li>
+<li>Payment Verification</li>
+<li>Customer Support</li>
 
-              </button>
+</ul>
 
-            </div>
+<button
+class="btn btn-red plan-btn"
+data-plan="1 Month"
+data-price="99">
+Order Now
+</button>
 
-          </div>
+</div>
 
-        </form>
 
+<!-- PLAN 2 -->
 
-        <!-- PAYMENT BOX -->
-        <div
-          class="payment-box"
-          id="paymentBox"
-          style="display:none">
+<div class="card popular">
 
-          <h3 style="margin-bottom:5px">
-            2. Complete Payment
-          </h3>
+<div class="ribbon">
+POPULAR
+</div>
 
-          <p style="color:var(--muted)">
+<h3>1 Month Premium</h3>
 
-            Order ID:
-            <strong id="payOrderId"></strong>
+<div class="price">
+৳199
+<small>/ month</small>
+</div>
 
-            · Amount:
+<ul class="features">
 
-            <strong id="payAmount"></strong>
+<li>Premium Package</li>
+<li>1 Month Access</li>
+<li>Digital Delivery</li>
+<li>Priority Support</li>
 
-          </p>
+</ul>
 
+<button
+class="btn btn-red plan-btn"
+data-plan="1 Month Premium"
+data-price="199">
+Order Now
+</button>
 
-          <!-- PAYMENT METHODS -->
-          <div class="payment-methods">
+</div>
 
-            <button
-              type="button"
-              class="pay-method"
-              data-method="bKash">
-              bKash
-            </button>
 
-            <button
-              type="button"
-              class="pay-method"
-              data-method="Nagad">
-              Nagad
-            </button>
+<!-- PLAN 3 -->
 
-            <button
-              type="button"
-              class="pay-method"
-              data-method="Rocket">
-              Rocket
-            </button>
+<div class="card">
 
-            <button
-              type="button"
-              class="pay-method"
-              data-method="Upay">
-              Upay
-            </button>
+<h3>2 Month Premium</h3>
 
-            <button
-              type="button"
-              class="pay-method"
-              data-method="USDT BEP20">
-              USDT<br>BEP20
-            </button>
+<div class="price">
+৳299
+<small>/ 2 months</small>
+</div>
 
-          </div>
+<ul class="features">
 
+<li>Premium Package</li>
+<li>2 Month Access</li>
+<li>Digital Delivery</li>
+<li>Customer Support</li>
 
-          <!-- PAYMENT ACCOUNT -->
-          <div
-            class="payment-info"
-            id="paymentInfo">
+</ul>
 
-            <div id="paymentTitle">
-              Payment account
-            </div>
+<button
+class="btn btn-red plan-btn"
+data-plan="2 Month Premium"
+data-price="299">
+Order Now
+</button>
 
-            <div
-              class="payment-number"
-              id="paymentNumber">
-              Select a method
-            </div>
+</div>
 
-            <button
-              type="button"
-              class="copy-btn"
-              id="copyPayment">
-              Copy
-            </button>
 
-            <p class="payment-warning">
-              Only send the exact order amount.
-              Send payment only to the selected account/address shown above.
-            </p>
+<!-- PLAN 4 -->
 
-          </div>
+<div class="card">
 
+<h3>6 Month</h3>
 
-          <!-- VERIFY -->
-          <div
-            class="verify-box"
-            id="verifyBox">
+<div class="price">
+৳599
+<small>/ 6 months</small>
+</div>
 
-            <h3>
-              3. Verify Payment
-            </h3>
+<ul class="features">
 
-            <p
-              style="color:var(--muted);margin:5px 0 14px">
+<li>6 Month Access</li>
+<li>Digital Delivery</li>
+<li>Payment Verification</li>
+<li>Customer Support</li>
 
-              After payment, enter the transaction/reference ID.
+</ul>
 
-            </p>
+<button
+class="btn btn-red plan-btn"
+data-plan="6 Month"
+data-price="599">
+Order Now
+</button>
 
+</div>
 
-            <div class="form-grid">
 
+<!-- PLAN 5 -->
 
-              <div class="field">
+<div class="card popular">
 
-                <label for="transactionId">
-                  Transaction / Reference ID *
-                </label>
+<div class="ribbon">
+BEST VALUE
+</div>
 
-                <input
-                  id="transactionId"
-                  placeholder="e.g. TXN123456">
+<h3>Lifetime Premium</h3>
 
-              </div>
+<div class="price">
+৳999
+<small>/ lifetime</small>
+</div>
 
+<ul class="features">
 
-              <div class="field">
+<li>Lifetime Access</li>
+<li>Premium Package</li>
+<li>Digital Delivery</li>
+<li>Priority Support</li>
 
-                <label for="payer">
-                  Payer Number / Wallet
-                </label>
+</ul>
 
-                <input
-                  id="payer"
-                  placeholder="Your payment number/wallet">
+<button
+class="btn btn-red plan-btn"
+data-plan="Lifetime Premium"
+data-price="999">
+Order Now
+</button>
 
-              </div>
+</div>
 
 
-              <div class="field full">
+</div>
 
-                <button
-                  class="btn btn-yellow"
-                  type="button"
-                  id="verifyBtn">
-
-                  ✓ Submit Payment Verification
-
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <div
-              id="verifyStatus"
-              style="display:none;margin-top:14px">
-            </div>
-
-
-            <!-- WAITING -->
-            <div
-              id="waitingBox"
-              style="
-                display:none;
-                margin-top:18px;
-                padding:20px;
-                border:1px solid #3b4050;
-                background:#10131c;
-                border-radius:14px;
-                text-align:center;
-              ">
-
-              <div
-                style="font-size:28px;margin-bottom:8px">
-                ⏳
-              </div>
-
-              <strong style="font-size:18px">
-                Please wait 5 minutes on this page
-              </strong>
-
-              <p
-                style="color:var(--muted);margin:8px 0 12px">
-
-                Your order is being checked.
-                Please keep this page open.
-
-              </p>
-
-              <div
-                id="waitingTimer"
-                style="
-                  font-size:24px;
-                  font-weight:900;
-                  color:var(--yellow);
-                ">
-                05:00
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <!-- DOWNLOAD -->
-          <div
-            class="download-box"
-            id="downloadBox">
-
-            <strong>
-              🔒 Payment Verified — Order Confirmed
-            </strong>
-
-            <p
-              style="color:var(--muted);margin:7px 0 14px">
-
-              Your panel file is ready for download.
-
-            </p>
-
-            <a
-              class="btn btn-red"
-              id="downloadBtn"
-              href="#"
-              download="panelExtreme.zip">
-
-              ⬇ Download ZIP File
-
-            </a>
-
-            <p class="note">
-              The ZIP download appears automatically after admin approval.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <p class="note">
-          Replace the WhatsApp number in the script with your seller number before publishing the website.
-        </p>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-<!-- FAQ -->
-<section id="faq">
-
-  <div class="container faq">
-
-    <div class="section-title">
-      <h2>Frequently Asked Questions</h2>
-      <p>Everything you need to know before placing your order.</p>
-    </div>
-
-    <details open>
-      <summary>🛒 How do I receive my order?</summary>
-      <p>
-        First, select your preferred package and complete the payment.
-        Submit your transaction/reference ID for verification. Once your
-        payment is approved by our team, your download option will appear
-        automatically on this page.
-      </p>
-    </details>
-
-    <details>
-      <summary>📱 Which devices are supported?</summary>
-      <p>
-        The panel is available for supported Mobile and PC devices.
-        Please make sure your device meets the requirements shown in the
-        product information before purchasing.
-      </p>
-    </details>
-
-    <details>
-      <summary>💰 Is there a refund or replacement?</summary>
-      <p>
-        Please contact our support team before making a purchase if you have
-        any questions about compatibility or package details. Refund or
-        replacement requests are handled according to the applicable
-        purchase and service policy.
-      </p>
-    </details>
-
-    <details>
-      <summary>🎧 Can I get help with setup?</summary>
-      <p>
-        Yes. Setup assistance is available for customers. If you face any
-        issue during installation or setup, contact our support team with
-        your order information and we will guide you through the process.
-      </p>
-    </details>
-
-    <details>
-      <summary>⚡ How long does payment verification take?</summary>
-      <p>
-        After submitting your payment information, please keep this page
-        open while your order is being reviewed. You will see the download
-        option automatically after admin approval.
-      </p>
-    </details>
-
-  </div>
+</div>
 
 </section>
 
 
-<!-- PREMIUM FOOTER -->
+<section id="features">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>Why Choose Us?</h2>
+
+<p>Simple and convenient ordering system.</p>
+
+</div>
+
+
+<div class="feature-grid">
+
+<div class="feature">
+
+<div class="icon">🎯</div>
+
+<h3>Easy Ordering</h3>
+
+<p>
+Select your package and create your order in seconds.
+</p>
+
+</div>
+
+
+<div class="feature">
+
+<div class="icon">💳</div>
+
+<h3>Multiple Payment</h3>
+
+<p>
+bKash, Nagad, Rocket, Upay and USDT available.
+</p>
+
+</div>
+
+
+<div class="feature">
+
+<div class="icon">⚡</div>
+
+<h3>Fast Verification</h3>
+
+<p>
+Orders are checked after payment submission.
+</p>
+
+</div>
+
+
+<div class="feature">
+
+<div class="icon">💬</div>
+
+<h3>WhatsApp Support</h3>
+
+<p>
+Contact support directly through WhatsApp.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="order">
+
+<div class="container">
+
+<div class="order">
+
+<div class="section-title">
+
+<h2>Create Your Order</h2>
+
+<p>
+Fill in your details and submit payment verification.
+</p>
+
+</div>
+
+
+<div class="order-form">
+
+<div class="form-grid">
+
+
+<div class="field">
+
+<label>Customer Name</label>
+
+<input
+type="text"
+id="customerName"
+placeholder="Enter your name">
+
+</div>
+
+
+<div class="field">
+
+<label>Contact Number</label>
+
+<input
+type="text"
+id="contact"
+placeholder="01XXXXXXXXX">
+
+</div>
+
+
+<div class="field">
+
+<label>Email</label>
+
+<input
+type="email"
+id="email"
+placeholder="Enter your email">
+
+</div>
+
+
+<div class="field">
+
+<label>Package</label>
+
+<select id="package">
+
+<option value="">Select Package</option>
+
+<option value="1 Month">1 Month — ৳99</option>
+
+<option value="1 Month Premium">
+1 Month Premium — ৳199
+</option>
+
+<option value="2 Month Premium">
+2 Month Premium — ৳299
+</option>
+
+<option value="6 Month">
+6 Month — ৳599
+</option>
+
+<option value="Lifetime Premium">
+Lifetime Premium — ৳999
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field full">
+
+<label>Note</label>
+
+<textarea
+id="note"
+placeholder="Optional note"></textarea>
+
+</div>
+
+
+</div>
+
+
+<button
+id="createOrderBtn"
+class="btn btn-yellow"
+style="width:100%;margin-top:18px">
+
+Create Order
+
+</button>
+
+
+<div id="orderInfo"
+style="display:none;margin-top:20px;text-align:center">
+
+<div class="status">
+ORDER CREATED
+</div>
+
+<p style="margin-top:10px">
+Your Order ID:
+</p>
+
+<h3
+id="orderIdDisplay"
+style="color:#ffd600;margin-top:5px">
+-
+</h3>
+
+</div>
+
+
+<div class="payment-box">
+
+<h3>
+Payment Method
+</h3>
+
+
+<div class="payment-methods">
+
+<button
+class="pay-method"
+data-method="bKash">
+bKash
+</button>
+
+<button
+class="pay-method"
+data-method="Nagad">
+Nagad
+</button>
+
+<button
+class="pay-method"
+data-method="Rocket">
+Rocket
+</button>
+
+<button
+class="pay-method"
+data-method="Upay">
+Upay
+</button>
+
+<button
+class="pay-method"
+data-method="USDT BEP20">
+USDT
+</button>
+
+</div>
+
+
+<div
+id="paymentInfo"
+class="payment-info">
+
+<p>
+Send payment to:
+</p>
+
+<div
+id="paymentNumber"
+class="payment-number">
+-
+</div>
+
+<button
+id="copyPayment"
+class="copy-btn">
+Copy
+</button>
+
+<p class="note">
+Make sure the payment amount matches your selected package.
+</p>
+
+</div>
+
+
+<div
+id="verifyBox"
+class="verify-box">
+
+<div class="field">
+
+<label>
+Transaction / Reference ID
+</label>
+
+<input
+type="text"
+id="transactionId"
+placeholder="Enter transaction ID">
+
+</div>
+
+
+<div
+class="field"
+style="margin-top:12px">
+
+<label>
+Payer Number / Wallet
+</label>
+
+<input
+type="text"
+id="payer"
+placeholder="Enter payer number">
+
+</div>
+
+
+<button
+id="verifyBtn"
+class="btn btn-red"
+style="width:100%;margin-top:15px">
+
+✓ Submit Payment Verification
+
+</button>
+
+
+<div
+id="verifyStatus"
+style="display:none;text-align:center;margin-top:15px">
+</div>
+
+
+<div
+id="waitingBox"
+class="waiting-box">
+
+<h3>
+Please wait 5 minutes
+</h3>
+
+<p>
+Your order is being checked.
+Please keep this page open.
+</p>
+
+<div
+id="waitingTimer"
+class="timer">
+05:00
+</div>
+
+</div>
+
+
+<div
+id="downloadBox"
+class="download-box">
+
+<h3 style="color:#7dff9a">
+APPROVED ✓
+</h3>
+
+<p style="margin:10px 0">
+Your order has been approved.
+</p>
+
+<a
+id="downloadBtn"
+href="panel-package.zip"
+download="panel-package.zip"
+class="btn btn-yellow">
+
+⬇ Download ZIP File
+
+</a>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="container">
+
+<div class="contact-box">
+
+<h3>
+Need Help?
+</h3>
+
+<p>
+Contact us directly on WhatsApp.
+</p>
+
+<a
+href="https://wa.me/8801311282081"
+target="_blank"
+class="btn btn-yellow">
+
+💬 WhatsApp: 01311282081
+
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="faq">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>FAQ</h2>
+
+</div>
+
+<div class="faq">
+
+
+<details>
+
+<summary>
+How do I order?
+</summary>
+
+<p>
+Select a package, fill in your information,
+create an order and submit your payment details.
+</p>
+
+</details>
+
+
+<details>
+
+<summary>
+How long does verification take?
+</summary>
+
+<p>
+Orders are normally checked within the displayed
+verification period.
+</p>
+
+</details>
+
+
+<details>
+
+<summary>
+How can I contact support?
+</summary>
+
+<p>
+Contact us on WhatsApp at 01311282081.
+</p>
+
+</details>
+
+
+</div>
+
+</div>
+
+</section>
+
+
 <footer>
 
-  <div class="container">
+<div class="container">
 
-    <div style="
-      max-width:850px;
-      margin:auto;
-      padding:10px 0;
-    ">
+<p>
+© 2026 Free Fire Panel Store. All rights reserved.
+</p>
 
-      <div style="
-        font-size:24px;
-        font-weight:900;
-        letter-spacing:1px;
-        margin-bottom:8px;
-      ">
-        FREE <span style="color:var(--yellow)">FIRE</span> PANEL
-      </div>
+<p style="margin-top:8px">
+WhatsApp:
+<a
+href="https://wa.me/8801311282081"
+target="_blank"
+style="color:#ffd600">
+01311282081
+</a>
+</p>
 
-      <p style="
-        color:#a8adbd;
-        max-width:600px;
-        margin:0 auto 18px;
-        font-size:14px;
-      ">
-        Premium panel packages with fast delivery,
-        secure checkout and customer support.
-      </p>
-
-      <div style="
-        display:flex;
-        justify-content:center;
-        gap:10px;
-        flex-wrap:wrap;
-        margin-bottom:20px;
-      ">
-
-        <a
-          href="#plans"
-          class="btn btn-outline"
-          style="padding:9px 15px;font-size:13px;">
-          📦 View Plans
-        </a>
-
-        <a
-          href="#order"
-          class="btn btn-yellow"
-          style="padding:9px 15px;font-size:13px;">
-          🛒 Order Now
-        </a>
-
-        <a
-          href="https://wa.me/8801311282081"
-          target="_blank"
-          rel="noopener"
-          class="btn btn-outline"
-          style="padding:9px 15px;font-size:13px;">
-          💬 WhatsApp Support
-        </a>
-
-      </div>
-
-      <div style="
-        height:1px;
-        background:var(--line);
-        margin:20px 0;
-      "></div>
-
-      <div style="
-        color:#777;
-        font-size:13px;
-        line-height:1.7;
-      ">
-
-        <div>
-          © 2026 <strong style="color:#aaa">Free Fire Panel Store</strong>.
-          All rights reserved.
-        </div>
-
-        <div style="margin-top:5px;">
-          Free Fire is a trademark of Garena.
-          This storefront is an independent service and is not affiliated
-          with or endorsed by Garena.
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
+</div>
 
 </footer>
-```
 
 
+<script>
 
-  <!-- =========================
-       JAVASCRIPT
-  ========================== -->
-  <script>
+/* =========================================
+   SUPABASE CONNECTION
+========================================= */
 
-    /* =========================
-       SUPABASE CONFIG
-    ========================== */
+const SUPABASE_URL =
+'https://gfeqsvefeifltjhxswor.supabase.co';
 
-    const SUPABASE_URL =
-      'https://gfeqsvefeifltjhxswor.supabase.co';
+const SUPABASE_KEY =
+'sb_publishable_Ibe-v4hrhD6Cb2ggYCwdnQ_uglELvkK';
 
-    const SUPABASE_KEY =
-      'sb_publishable_Ibe-v4hrhD6Cb2ggYCwdnQ_uglELvkK';
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
 
+/* =========================================
+   PAYMENT INFORMATION
+========================================= */
 
-    /* =========================
-       ELEMENTS
-    ========================== */
+const paymentNumbers = {
 
-    const buttons =
-      document.querySelectorAll('.order-btn');
+  bKash:
+  '01311282081',
 
-    const planSelect =
-      document.getElementById('plan');
+  Nagad:
+  '01311282081',
 
-    const form =
-      document.getElementById('orderForm');
+  Rocket:
+  '01311282081',
 
-    const paymentBox =
-      document.getElementById('paymentBox');
+  Upay:
+  '01311282081',
 
-    const payOrderId =
-      document.getElementById('payOrderId');
+  'USDT BEP20':
+  '0x3c92727fd877c1ef6aac85c1576630918f6b5ef5'
 
-    const payAmount =
-      document.getElementById('payAmount');
+};
 
-    const paymentInfo =
-      document.getElementById('paymentInfo');
 
-    const paymentNumber =
-      document.getElementById('paymentNumber');
+const prices = {
 
-    const paymentTitle =
-      document.getElementById('paymentTitle');
+  '1 Month':99,
 
-    const copyPayment =
-      document.getElementById('copyPayment');
+  '1 Month Premium':199,
 
-    const verifyBox =
-      document.getElementById('verifyBox');
+  '2 Month Premium':299,
 
-    const verifyBtn =
-      document.getElementById('verifyBtn');
+  '6 Month':599,
 
-    const verifyStatus =
-      document.getElementById('verifyStatus');
+  'Lifetime Premium':999
 
-    const waitingBox =
-      document.getElementById('waitingBox');
+};
 
-    const waitingTimer =
-      document.getElementById('waitingTimer');
 
-    const downloadBox =
-      document.getElementById('downloadBox');
+/* =========================================
+   ELEMENTS
+========================================= */
 
-    const downloadBtn =
-      document.getElementById('downloadBtn');
+const customerName =
+document.getElementById('customerName');
 
+const contact =
+document.getElementById('contact');
 
-    /* =========================
-       PAYMENT ACCOUNTS
-    ========================== */
+const email =
+document.getElementById('email');
 
-    const paymentAccounts = {
+const packageSelect =
+document.getElementById('package');
 
-      'bKash':
-        '01311282081',
+const note =
+document.getElementById('note');
 
-      'Nagad':
-        '01311282081',
+const createOrderBtn =
+document.getElementById('createOrderBtn');
 
-      'Rocket':
-        '01311282081',
+const orderInfo =
+document.getElementById('orderInfo');
 
-      'Upay':
-        '01311282081',
+const orderIdDisplay =
+document.getElementById('orderIdDisplay');
 
-      'USDT BEP20':
-        '0x3c92727fd877c1ef6aac85c1576630918f6b5ef5'
+const paymentInfo =
+document.getElementById('paymentInfo');
 
-    };
+const paymentNumber =
+document.getElementById('paymentNumber');
 
+const copyPayment =
+document.getElementById('copyPayment');
 
-    /* =========================
-       PRICES
-    ========================== */
+const verifyBox =
+document.getElementById('verifyBox');
 
-    const prices = {
+const verifyBtn =
+document.getElementById('verifyBtn');
 
-      '1 Month — ৳99':
-        '৳99',
+const transactionId =
+document.getElementById('transactionId');
 
-      '1 Month Premium — ৳199':
-        '৳199',
+const payer =
+document.getElementById('payer');
 
-      '2 Month Premium — ৳299':
-        '৳299',
+const verifyStatus =
+document.getElementById('verifyStatus');
 
-      '6 Month — ৳599':
-        '৳599',
+const waitingBox =
+document.getElementById('waitingBox');
 
-      'Lifetime Premium — ৳999':
-        '৳999'
+const waitingTimer =
+document.getElementById('waitingTimer');
 
-    };
+const downloadBox =
+document.getElementById('downloadBox');
 
+const downloadBtn =
+document.getElementById('downloadBtn');
 
-    /* =========================
-       NUMERIC AMOUNTS
-    ========================== */
 
-    const amounts = {
+let selectedMethod = null;
 
-      '1 Month — ৳99':
-        99,
+let currentOrder = null;
 
-      '1 Month Premium — ৳199':
-        199,
+let waitingInterval = null;
 
-      '2 Month Premium — ৳299':
-        299,
+let approvalInterval = null;
 
-      '6 Month — ৳599':
-        599,
 
-      'Lifetime Premium — ৳999':
-        999
+/* =========================================
+   PLAN BUTTONS
+========================================= */
 
-    };
+document.querySelectorAll('.plan-btn')
+.forEach(function(button){
 
+  button.addEventListener('click',function(){
 
-    /* =========================
-       STATE
-    ========================== */
+    const plan =
+    button.dataset.plan;
 
-    let currentOrder = null;
+    packageSelect.value =
+    plan;
 
-    let selectedMethod = '';
+    document
+    .getElementById('order')
+    .scrollIntoView({
+      behavior:'smooth'
+    });
 
-    let waitingInterval = null;
+  });
 
-    let approvalInterval = null;
+});
 
 
-    /* =========================
-       LOCAL STORAGE
-    ========================== */
+/* =========================================
+   PAYMENT METHOD
+========================================= */
 
-    function getOrders(){
+document.querySelectorAll('.pay-method')
+.forEach(function(button){
 
-      try{
+  button.addEventListener('click',function(){
 
-        return JSON.parse(
-          localStorage.getItem('ffp_orders') || '[]'
-        );
+    document
+    .querySelectorAll('.pay-method')
+    .forEach(function(btn){
 
-      }catch(error){
-
-        console.error(
-          'Local storage read failed:',
-          error
-        );
-
-        return [];
-
-      }
-
-    }
-
-
-    function saveOrders(orders){
-
-      try{
-
-        localStorage.setItem(
-          'ffp_orders',
-          JSON.stringify(orders)
-        );
-
-      }catch(error){
-
-        console.error(
-          'Local storage save failed:',
-          error
-        );
-
-      }
-
-    }
-
-
-    /* =========================
-       PLAN BUTTONS
-    ========================== */
-
-    buttons.forEach(function(btn){
-
-      btn.addEventListener(
-        'click',
-        function(){
-
-          const selectedPlan =
-            btn.getAttribute('data-plan');
-
-          if(selectedPlan){
-
-            planSelect.value =
-              selectedPlan;
-
-          }
-
-        }
-      );
+      btn.classList.remove('active');
 
     });
 
+    button.classList.add('active');
 
-    /* =========================
-       CREATE ORDER
-    ========================== */
+    selectedMethod =
+    button.dataset.method;
 
-    form.addEventListener(
-      'submit',
-      async function(event){
+    paymentNumber.textContent =
+    paymentNumbers[selectedMethod];
 
-        event.preventDefault();
+    paymentInfo.classList.add('show');
 
+  });
 
-        const plan =
-          planSelect.value;
+});
 
-        const name =
-          document
-            .getElementById('name')
-            .value
-            .trim();
 
-        const contact =
-          document
-            .getElementById('contact')
-            .value
-            .trim();
+/* =========================================
+   COPY PAYMENT
+========================================= */
 
-        game_uid:
-  currentOrder.uid ||
-  null,
+copyPayment.addEventListener(
+'click',
+async function(){
 
-        const note =
-          document
-            .getElementById('noteInput')
-            .value
-            .trim();
+  if(!selectedMethod){
+    return;
+  }
 
+  try{
 
-        if(!plan){
-
-          alert(
-            'Please select a package.'
-          );
-
-          return;
-
-        }
-
-
-        if(!name){
-
-          alert(
-            'Please enter your name.'
-          );
-
-          return;
-
-        }
-
-
-        if(!contact){
-
-          alert(
-            'Please enter your WhatsApp / Contact.'
-          );
-
-          return;
-
-        }
-
-
-        currentOrder = {
-
-          orderId:
-            'FFP-' +
-            Date.now()
-              .toString()
-              .slice(-8),
-
-          plan:
-            plan,
-
-          name:
-            name,
-
-          contact:
-            contact,
-
-          uid:
-            uid,
-
-          note:
-            note,
-
-          amount:
-            prices[plan] || '',
-
-          paymentMethod:
-            '',
-
-          transactionId:
-            '',
-
-          payer:
-            '',
-
-          status:
-            'ORDER CREATED',
-
-          createdAt:
-            new Date().toLocaleString()
-
-        };
-
-
-        /* Show payment information */
-
-        payOrderId.textContent =
-          currentOrder.orderId;
-
-        payAmount.textContent =
-          currentOrder.amount;
-
-
-        paymentBox.style.display =
-          'block';
-
-
-        verifyStatus.style.display =
-          'none';
-
-        verifyStatus.innerHTML =
-          '';
-
-
-        downloadBox.classList.remove(
-          'show'
-        );
-
-
-        waitingBox.style.display =
-          'none';
-
-
-        /* Reset payment selection */
-
-        selectedMethod = '';
-
-        paymentInfo.classList.remove(
-          'show'
-        );
-
-        verifyBox.classList.remove(
-          'show'
-        );
-
-
-        document
-          .querySelectorAll('.pay-method')
-          .forEach(function(method){
-
-            method.classList.remove(
-              'active'
-            );
-
-          });
-
-
-        paymentTitle.textContent =
-          'Payment account';
-
-        paymentNumber.textContent =
-          'Select a method';
-
-
-        /*
-         * Scroll to payment section
-         */
-
-        setTimeout(function(){
-
-          paymentBox.scrollIntoView({
-
-            behavior:'smooth',
-
-            block:'center'
-
-          });
-
-        },100);
-
-      }
+    await navigator.clipboard.writeText(
+      paymentNumbers[selectedMethod]
     );
 
+    copyPayment.textContent =
+    'Copied ✓';
 
-    /* =========================
-       PAYMENT METHOD
-    ========================== */
+    setTimeout(function(){
 
-    document
-      .querySelectorAll('.pay-method')
-      .forEach(function(btn){
+      copyPayment.textContent =
+      'Copy';
 
-        btn.addEventListener(
-          'click',
-          function(){
+    },1200);
 
-            document
-              .querySelectorAll('.pay-method')
-              .forEach(function(item){
+  }catch(error){
 
-                item.classList.remove(
-                  'active'
-                );
-
-              });
-
-
-            btn.classList.add(
-              'active'
-            );
-
-
-            selectedMethod =
-              btn.getAttribute(
-                'data-method'
-              );
-
-
-            paymentTitle.textContent =
-              selectedMethod +
-              ' payment account';
-
-
-            paymentNumber.textContent =
-              paymentAccounts[
-                selectedMethod
-              ] || '';
-
-
-            paymentInfo.classList.add(
-              'show'
-            );
-
-
-            verifyBox.classList.add(
-              'show'
-            );
-
-          }
-        );
-
-      });
-
-
-    /* =========================
-       COPY PAYMENT ACCOUNT
-    ========================== */
-
-    copyPayment.addEventListener(
-      'click',
-      async function(){
-
-        const value =
-          paymentNumber.textContent.trim();
-
-
-        if(!value ||
-           value === 'Select a method'){
-
-          alert(
-            'Please select a payment method first.'
-          );
-
-          return;
-
-        }
-
-
-        try{
-
-          await navigator.clipboard.writeText(
-            value
-          );
-
-          copyPayment.textContent =
-            'Copied ✓';
-
-
-          setTimeout(function(){
-
-            copyPayment.textContent =
-              'Copy';
-
-          },1200);
-
-
-        }catch(error){
-
-          alert(
-            'Please copy the payment address manually.'
-          );
-
-        }
-
-      }
+    alert(
+      'Please copy the payment number manually.'
     );
 
+  }
 
-    /* =========================
-       SHOW APPROVED DOWNLOAD
-    ========================== */
-
-    function showApprovedDownload(order){
-
-      if(!order){
-
-        return;
-
-      }
+});
 
 
-      if(waitingBox){
+/* =========================================
+   GENERATE ORDER ID
+========================================= */
 
-        waitingBox.style.display =
-          'none';
+function generateOrderId(){
 
-      }
+  const random =
+  Math.random()
+  .toString(36)
+  .substring(2,10)
+  .toUpperCase();
 
+  return 'FFP-' + random;
 
-      if(waitingInterval){
-
-        clearInterval(
-          waitingInterval
-        );
-
-        waitingInterval =
-          null;
-
-      }
+}
 
 
-      if(approvalInterval){
+/* =========================================
+   CREATE ORDER
+========================================= */
 
-        clearInterval(
-          approvalInterval
-        );
+createOrderBtn.addEventListener(
+'click',
+async function(){
 
-        approvalInterval =
-          null;
+  const name =
+  customerName.value.trim();
 
-      }
+  const phone =
+  contact.value.trim();
+
+  const mail =
+  email.value.trim();
+
+  const plan =
+  packageSelect.value;
+
+  const orderNote =
+  note.value.trim();
 
 
-      downloadBox.classList.add(
-        'show'
+  if(!name){
+
+    alert('Please enter your name.');
+
+    return;
+
+  }
+
+
+  if(!phone){
+
+    alert('Please enter your contact number.');
+
+    return;
+
+  }
+
+
+  if(!mail){
+
+    alert('Please enter your email.');
+
+    return;
+
+  }
+
+
+  if(!plan){
+
+    alert('Please select a package.');
+
+    return;
+
+  }
+
+
+  const orderId =
+  generateOrderId();
+
+
+  currentOrder = {
+
+    orderId:orderId,
+
+    name:name,
+
+    contact:phone,
+
+    email:mail,
+
+    plan:plan,
+
+    amount:prices[plan],
+
+    note:orderNote,
+
+    status:'CREATED'
+
+  };
+
+
+  orderIdDisplay.textContent =
+  orderId;
+
+  orderInfo.style.display =
+  'block';
+
+  verifyBox.classList.add('show');
+
+
+  document
+  .getElementById('order')
+  .scrollIntoView({
+    behavior:'smooth'
+  });
+
+
+});
+
+
+/* =========================================
+   SUBMIT PAYMENT
+========================================= */
+
+verifyBtn.addEventListener(
+'click',
+async function(){
+
+  if(!currentOrder){
+
+    alert(
+      'Please create an order first.'
+    );
+
+    return;
+
+  }
+
+
+  if(!selectedMethod){
+
+    alert(
+      'Please select a payment method.'
+    );
+
+    return;
+
+  }
+
+
+  const txn =
+  transactionId.value.trim();
+
+  const payerNumber =
+  payer.value.trim();
+
+
+  if(!txn){
+
+    alert(
+      'Please enter the transaction/reference ID.'
+    );
+
+    return;
+
+  }
+
+
+  verifyBtn.disabled =
+  true;
+
+  verifyBtn.textContent =
+  'Submitting...';
+
+
+  try{
+
+    const {data,error} =
+    await supabaseClient
+    .from('orders')
+    .insert({
+
+      order_id:
+      currentOrder.orderId,
+
+      customer_name:
+      currentOrder.name,
+
+      contact:
+      currentOrder.contact,
+
+      email:
+      currentOrder.email,
+
+      package_name:
+      currentOrder.plan,
+
+      amount:
+      currentOrder.amount,
+
+      payment_method:
+      selectedMethod,
+
+      transaction_id:
+      txn,
+
+      payer_number:
+      payerNumber || null,
+
+      note:
+      currentOrder.note || null,
+
+      status:
+      'PENDING'
+
+    })
+    .select();
+
+
+    if(error){
+
+      console.error(error);
+
+      alert(
+        'Order submit failed:\n' +
+        error.message
       );
 
-
-      downloadBtn.href =
-  'https://github.com/antibanpanel/premiun-panel/raw/refs/heads/main/panelExtreme.zip';
-
-
-      downloadBtn.download =
-        'panelExtreme.zip';
-
-
-      downloadBtn.textContent =
-        '⬇ Download ZIP File';
-
-
-      verifyStatus.style.display =
-        'block';
-
-
-      verifyStatus.innerHTML =
-        '<span class="status" style="border-color:#426f4c;color:#7dff9a">APPROVED ✓ — ZIP FILE IS READY</span>';
+      return;
 
     }
 
 
-    /* =========================
-       CHECK ORDER APPROVAL
-    ========================== */
-
-    async function checkApproval(){
-
-      if(!currentOrder){
-
-        return;
-
-      }
+    currentOrder.status =
+    'PENDING';
 
 
-      try{
+    verifyStatus.style.display =
+    'block';
 
-        const result =
-          await supabaseClient
-            .rpc(
-              'get_order_status',
-              {
-                p_order_id:
-                  currentOrder.orderId
-              }
-            );
+    verifyStatus.innerHTML =
+    '<span class="status">' +
+    'SUBMITTED ✓ — ORDER SENT FOR VERIFICATION' +
+    '</span>';
 
 
-        const data =
-          result.data;
+    startWaiting();
 
-        const error =
-          result.error;
+    startApprovalChecking();
 
 
-        if(error){
+  }catch(error){
 
-          console.error(
-            'Approval check failed:',
-            error
-          );
+    console.error(error);
 
-          return;
+    alert(
+      'Something went wrong. Please try again.'
+    );
 
-        }
+  }finally{
 
+    verifyBtn.disabled =
+    false;
 
-        if(!data ||
-           !data.length){
+    verifyBtn.textContent =
+    '✓ Submit Payment Verification';
 
-          return;
+  }
 
-        }
-
-
-        const saved =
-          data[0];
+});
 
 
-        /* APPROVED */
+/* =========================================
+   5 MINUTE WAITING
+========================================= */
 
-        if(
-          saved.order_status ===
-          'Approved'
-        ){
+function startWaiting(){
 
-          currentOrder.status =
-            'APPROVED — READY FOR DELIVERY';
+  waitingBox.style.display =
+  'block';
 
-
-          showApprovedDownload(
-            currentOrder
-          );
+  let remaining =
+  300;
 
 
-          return;
-
-        }
-
-
-        /* REJECTED */
-
-        if(
-          saved.order_status ===
-          'Rejected'
-        ){
-
-          currentOrder.status =
-            'REJECTED';
+  waitingTimer.textContent =
+  '05:00';
 
 
-          if(waitingBox){
+  if(waitingInterval){
 
-            waitingBox.style.display =
-              'none';
+    clearInterval(waitingInterval);
 
-          }
-
-
-          if(waitingInterval){
-
-            clearInterval(
-              waitingInterval
-            );
-
-            waitingInterval =
-              null;
-
-          }
+  }
 
 
-          if(approvalInterval){
+  waitingInterval =
+  setInterval(function(){
 
-            clearInterval(
-              approvalInterval
-            );
-
-            approvalInterval =
-              null;
-
-          }
+    remaining--;
 
 
-          downloadBox.classList.remove(
-            'show'
-          );
+    if(remaining <= 0){
 
+      clearInterval(
+        waitingInterval
+      );
 
-          verifyStatus.style.display =
-            'block';
+      waitingInterval =
+      null;
 
+      waitingTimer.textContent =
+      'Verification time completed';
 
-          verifyStatus.innerHTML =
-            '<span class="status" style="border-color:#6f4242;color:#ff8f8f">REJECTED — PLEASE CONTACT SUPPORT</span>';
-
-        }
-
-      }catch(error){
-
-        console.error(
-          'Approval check error:',
-          error
-        );
-
-      }
+      return;
 
     }
 
 
-    /* =========================
-       START APPROVAL CHECKING
-    ========================== */
-
-    function startApprovalChecking(){
-
-      if(approvalInterval){
-
-        clearInterval(
-          approvalInterval
-        );
-
-      }
+    const minutes =
+    String(
+      Math.floor(remaining / 60)
+    ).padStart(2,'0');
 
 
-      approvalInterval =
-        setInterval(
-          checkApproval,
-          3000
-        );
+    const seconds =
+    String(
+      remaining % 60
+    ).padStart(2,'0');
 
 
-      checkApproval();
+    waitingTimer.textContent =
+    minutes + ':' + seconds;
+
+
+  },1000);
+
+}
+
+
+/* =========================================
+   CHECK APPROVAL
+========================================= */
+
+async function checkApproval(){
+
+  if(!currentOrder){
+
+    return;
+
+  }
+
+
+  try{
+
+    const {data,error} =
+    await supabaseClient
+    .from('orders')
+    .select('status')
+    .eq(
+      'order_id',
+      currentOrder.orderId
+    )
+    .maybeSingle();
+
+
+    if(error){
+
+      console.error(
+        'Approval check:',
+        error
+      );
+
+      return;
 
     }
 
 
-    /* =========================
-       PAYMENT VERIFICATION
-    ========================== */
+    if(!data){
 
-    verifyBtn.addEventListener(
-      'click',
-      async function(){
+      return;
 
-        if(!currentOrder){
+    }
 
-          alert(
-            'Please create an order first.'
-          );
 
-          return;
+    const status =
+    String(data.status || '')
+    .toUpperCase();
 
-        }
 
+    /* APPROVED */
 
-        const txn =
-          document
-            .getElementById('transactionId')
-            .value
-            .trim();
+    if(status === 'APPROVED'){
 
+      showApproved();
 
-        const payer =
-          document
-            .getElementById('payer')
-            .value
-            .trim();
+      return;
 
+    }
 
-        if(!selectedMethod){
 
-          alert(
-            'Please select a payment method.'
-          );
+    /* REJECTED */
 
-          return;
+    if(status === 'REJECTED'){
 
-        }
+      showRejected();
 
+      return;
 
-        if(!txn){
+    }
 
-          alert(
-            'Please enter the transaction/reference ID.'
-          );
+  }catch(error){
 
-          return;
+    console.error(error);
 
-        }
+  }
 
+}
 
-        /*
-         * Prevent accidental double submit
-         */
 
-        verifyBtn.disabled =
-          true;
+/* =========================================
+   START APPROVAL CHECKING
+========================================= */
 
-        verifyBtn.textContent =
-          'Submitting...';
+function startApprovalChecking(){
 
+  if(approvalInterval){
 
-        currentOrder.paymentMethod =
-          selectedMethod;
-
-        currentOrder.transactionId =
-          txn;
-
-        currentOrder.payer =
-          payer;
-
-        currentOrder.status =
-          'PAYMENT SUBMITTED — PENDING ADMIN APPROVAL';
-
-
-        try{
-
-          /*
-           * INSERT ORDER INTO SUPABASE
-           */
-
-          const result =
-            await supabaseClient
-              .from('orders')
-              .insert([
-                {
-
-                  order_id:
-                    currentOrder.orderId,
-
-                  package_name:
-                    currentOrder.plan,
-
-                  amount:
-                    amounts[
-                      currentOrder.plan
-                    ] || 0,
-
-                  customer_name:
-                    currentOrder.name,
-
-                  contact:
-                    currentOrder.contact,
-
-                  game_uid:
-                    currentOrder.uid ||
-                    null,
-
-                  additional_note:
-                    currentOrder.note ||
-                    null,
-
-                  payment_method:
-                    currentOrder.paymentMethod,
-
-                  transaction_id:
-                    currentOrder.transactionId,
-
-                  payer_number:
-                    currentOrder.payer ||
-                    null,
-
-                  payment_status:
-                    'Pending',
-
-                  order_status:
-                    'Pending'
-
-                }
-              ]);
-
-
-          if(result.error){
-
-            console.error(
-              result.error
-            );
-
-            alert(
-              'Order submit failed: ' +
-              result.error.message
-            );
-
-            verifyBtn.disabled =
-              false;
-
-            verifyBtn.textContent =
-              '✓ Submit Payment Verification';
-
-            return;
-
-          }
-
-
-          /*
-           * Save local copy
-           */
-
-          const orders =
-            getOrders();
-
-
-          orders.unshift(
-            currentOrder
-          );
-
-
-          saveOrders(
-            orders
-          );
-
-
-          /*
-           * SUCCESS MESSAGE
-           */
-
-          verifyStatus.style.display =
-            'block';
-
-
-          verifyStatus.innerHTML =
-            '<span class="status">SUBMITTED ✓ — ORDER SENT FOR VERIFICATION</span>';
-
-
-          /*
-           * Show waiting box
-           */
-
-          waitingBox.style.display =
-            'block';
-
-
-          let remaining =
-            300;
-
-
-          waitingTimer.textContent =
-            '05:00';
-
-
-          if(waitingInterval){
-
-            clearInterval(
-              waitingInterval
-            );
-
-          }
-
-
-          waitingInterval =
-            setInterval(
-              function(){
-
-                /*
-                 * Check admin approval
-                 */
-
-                checkApproval();
-
-
-                remaining--;
-
-
-                if(remaining <= 0){
-
-                  clearInterval(
-                    waitingInterval
-                  );
-
-                  waitingInterval =
-                    null;
-
-                  waitingTimer.textContent =
-                    'Verification time completed';
-
-                  return;
-
-                }
-
-
-                const minutes =
-                  String(
-                    Math.floor(
-                      remaining / 60
-                    )
-                  ).padStart(
-                    2,
-                    '0'
-                  );
-
-
-                const seconds =
-                  String(
-                    remaining % 60
-                  ).padStart(
-                    2,
-                    '0'
-                  );
-
-
-                waitingTimer.textContent =
-                  minutes +
-                  ':' +
-                  seconds;
-
-              },
-              1000
-            );
-
-
-          /*
-           * Separate approval checker
-           */
-
-          startApprovalChecking();
-
-
-          /*
-           * Scroll to waiting box
-           */
-
-          waitingBox.scrollIntoView({
-
-            behavior:'smooth',
-
-            block:'center'
-
-          });
-
-
-        }catch(error){
-
-          console.error(
-            'Payment verification error:',
-            error
-          );
-
-
-          alert(
-            'Something went wrong. Please try again.'
-          );
-
-
-        }finally{
-
-          verifyBtn.disabled =
-            false;
-
-          verifyBtn.textContent =
-            '✓ Submit Payment Verification';
-
-        }
-
-      }
+    clearInterval(
+      approvalInterval
     );
 
+  }
 
-    /* =========================
-       PAGE VISIBILITY
-    ========================== */
 
-    document.addEventListener(
-      'visibilitychange',
-      function(){
+  approvalInterval =
+  setInterval(
+    checkApproval,
+    3000
+  );
 
-        if(!document.hidden){
 
-          checkApproval();
+  checkApproval();
 
-        }
+}
 
-      }
+
+/* =========================================
+   APPROVED
+========================================= */
+
+function showApproved(){
+
+  if(waitingInterval){
+
+    clearInterval(
+      waitingInterval
     );
 
+    waitingInterval =
+    null;
 
-    /* =========================
-       STORAGE EVENT
-    ========================== */
+  }
 
-    window.addEventListener(
-      'storage',
-      function(){
 
-        checkApproval();
+  if(approvalInterval){
 
-      }
+    clearInterval(
+      approvalInterval
     );
 
+    approvalInterval =
+    null;
 
-    /* =========================
-       DEBUG MESSAGE
-    ========================== */
+  }
 
-    console.log(
-      'Free Fire Panel Store loaded successfully.'
+
+  waitingBox.style.display =
+  'none';
+
+
+  downloadBox.classList.add(
+    'show'
+  );
+
+
+  downloadBtn.href =
+  'panel-package.zip';
+
+
+  downloadBtn.download =
+  'panel-package.zip';
+
+
+  verifyStatus.style.display =
+  'block';
+
+
+  verifyStatus.innerHTML =
+  '<span class="status" ' +
+  'style="color:#7dff9a;background:#102616">' +
+  'APPROVED ✓ — ZIP FILE IS READY' +
+  '</span>';
+
+}
+
+
+/* =========================================
+   REJECTED
+========================================= */
+
+function showRejected(){
+
+  if(waitingInterval){
+
+    clearInterval(
+      waitingInterval
     );
 
-  </script>
+    waitingInterval =
+    null;
+
+  }
+
+
+  if(approvalInterval){
+
+    clearInterval(
+      approvalInterval
+    );
+
+    approvalInterval =
+    null;
+
+  }
+
+
+  waitingBox.style.display =
+  'none';
+
+
+  downloadBox.classList.remove(
+    'show'
+  );
+
+
+  verifyStatus.style.display =
+  'block';
+
+
+  verifyStatus.innerHTML =
+  '<span class="status" ' +
+  'style="color:#ff8f8f;background:#301010">' +
+  'REJECTED — PLEASE CONTACT SUPPORT' +
+  '</span>';
+
+}
+
+
+/* =========================================
+   PAGE VISIBILITY
+========================================= */
+
+document.addEventListener(
+'visibilitychange',
+function(){
+
+  if(!document.hidden){
+
+    checkApproval();
+
+  }
+
+});
+
+
+console.log(
+'Store loaded successfully.'
+);
+
+</script>
 
 </body>
 </html>
