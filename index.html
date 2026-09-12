@@ -7,6 +7,9 @@
 <title>Free Fire Panel Store</title>
 <meta name="description" content="Free Fire Panel Store - Premium Panel Plans">
 
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{
   --bg:#07080d;
@@ -486,6 +489,11 @@ section{
   font-size:15px;
 }
 
+.submit-btn:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+}
+
 /* FAQ */
 
 .faq{
@@ -667,8 +675,6 @@ footer strong{
 
     </div>
 
-
-    <!-- HERO CARD -->
 
     <div class="hero-card">
 
@@ -879,8 +885,6 @@ footer strong{
     <div class="plans-grid">
 
 
-      <!-- PLAN 1 -->
-
       <div class="plan">
 
         <h3>
@@ -906,8 +910,6 @@ footer strong{
 
       </div>
 
-
-      <!-- PLAN 2 -->
 
       <div class="plan premium">
 
@@ -939,8 +941,6 @@ footer strong{
       </div>
 
 
-      <!-- PLAN 3 -->
-
       <div class="plan">
 
         <h3>
@@ -967,8 +967,6 @@ footer strong{
       </div>
 
 
-      <!-- PLAN 4 -->
-
       <div class="plan">
 
         <h3>
@@ -994,8 +992,6 @@ footer strong{
 
       </div>
 
-
-      <!-- PLAN 5 -->
 
       <div class="plan premium">
 
@@ -1156,7 +1152,8 @@ footer strong{
 
         <button
           type="submit"
-          class="submit-btn">
+          class="submit-btn"
+          id="submitBtn">
 
           🛒 Create Order
 
@@ -1191,7 +1188,6 @@ footer strong{
 
 
     <div class="faq">
-
 
       <details>
 
@@ -1315,6 +1311,23 @@ footer strong{
 <script>
 
 /* ==========================================
+   SUPABASE CONFIG
+========================================== */
+
+const SUPABASE_URL =
+  "https://jwismqdhjfzqkyymavsh.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_834SpxBcbMD6CEkEXx2GXA_84NYcoWL";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* ==========================================
    SELECT PLAN
 ========================================== */
 
@@ -1335,9 +1348,13 @@ function selectPlan(plan){
 
 document
 .getElementById("orderForm")
-.addEventListener("submit", function(e){
+.addEventListener("submit", async function(e){
 
   e.preventDefault();
+
+
+  const submitBtn =
+    document.getElementById("submitBtn");
 
 
   const name =
@@ -1391,6 +1408,14 @@ document
   }
 
 
+  /* PREVENT DOUBLE SUBMIT */
+
+  submitBtn.disabled = true;
+
+  submitBtn.textContent =
+    "⏳ Creating Order...";
+
+
   /* CREATE UNIQUE ORDER ID */
 
   const orderId =
@@ -1428,19 +1453,86 @@ document
   };
 
 
-  /* SAVE ORDER */
+  try{
 
-  localStorage.setItem(
-    "ff_current_order",
-    JSON.stringify(order)
-  );
+    /* ====================================
+       SAVE TO SUPABASE
+    ==================================== */
+
+    const { data, error } =
+      await supabaseClient
+        .from("orders")
+        .insert([{
+
+          order_id: orderId,
+
+          customer_name: name,
+
+          phone: phone,
+
+          email: email,
+
+          package: packageName,
+
+          note: note,
+
+          status: "pending",
+
+          created_at:
+            new Date().toISOString()
+
+        }])
+        .select()
+        .single();
 
 
-  /* GO TO PAYMENT PAGE */
+    if(error){
 
-  window.location.href =
-    "payment.html?order=" +
-    encodeURIComponent(orderId);
+      console.error(
+        "Supabase Error:",
+        error
+      );
+
+      throw error;
+
+    }
+
+
+    /* ====================================
+       ALSO SAVE LOCALLY
+    ==================================== */
+
+    localStorage.setItem(
+      "ff_current_order",
+      JSON.stringify(order)
+    );
+
+
+    /* ====================================
+       GO TO PAYMENT PAGE
+    ==================================== */
+
+    window.location.href =
+      "payment.html?order=" +
+      encodeURIComponent(orderId);
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "❌ Order create করা যায়নি.\n\n" +
+      "Supabase connection বা database policy check করুন."
+    );
+
+
+    submitBtn.disabled = false;
+
+    submitBtn.textContent =
+      "🛒 Create Order";
+
+  }
 
 });
 
