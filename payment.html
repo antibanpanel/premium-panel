@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Free Fire Panel Store</title>
+<meta name="description" content="Free Fire Panel Store - Premium Panel Plans">
+
+<style>
+:root{
+  --bg:#07080d;
+  --card:#11131b;
+  --card2:#151824;
+  --red:#ff1744;
+  --yellow:#ffd600;
+  --white:#fff;
+  --muted:#9da3b4;
+  --border:rgba(255,255,255,.08);
+  --green:#20df70;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(255,23,68,.12),transparent 30%),
+    radial-gradient(circle at 80% 20%,rgba(255,214,0,.08),transparent 25%),
+    var(--bg);
+  color:var(--white);
+  line-height:1.6;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+.container{
+  width:min(1120px,92%);
+  margin:auto;
+}
+
+/* NAV */
+
+nav{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(7,8,13,.88);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+
+.nav-inner{
+  min-height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:900;
+}
+
+.logo span{
+  color:var(--red);
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  color:#d9dce5;
+  font-size:14px;
+}
+
+.nav-links a:hover{
+  color:var(--yellow);
+}
+
+.nav-btn{
+  background:linear-gradient(135deg,var(--red),#ff4567);
+  padding:11px 18px;
+  border-radius:10px;
+  font-weight:800;
+  font-size:14px;
+}
+
+/* HERO */
+
+.hero{
+  padding:85px 0 55px;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:35px;
+  align-items:center;
+}
+
+.badge{
+  display:inline-flex;
+  padding:7px 13px;
+  border:1px solid rgba(255,214,0,.25);
+  background:rgba(255,214,0,.07);
+  color:var(--yellow);
+  border-radius:30px;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:18px;
+}
+
+.hero h1{
+  font-size:clamp(38px,5vw,68px);
+  line-height:1.03;
+  margin-bottom:20px;
+  font-weight:950;
+}
+
+.hero h1 span{
+  color:var(--red);
+}
+
+.hero p{
+  color:var(--muted);
+  max-width:650px;
+  font-size:17px;
+  margin-bottom:28px;
+}
+
+.hero-buttons{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  border:none;
+  cursor:pointer;
+  padding:14px 22px;
+  border-radius:12px;
+  font-weight:900;
+  font-size:14px;
+  display:inline-block;
+}
+
+.btn-red{
+  background:linear-gradient(135deg,var(--red),#ff3158);
+  color:#fff;
+}
+
+.btn-dark{
+  background:#151821;
+  border:1px solid var(--border);
+  color:#fff;
+}
+
+/* HERO CARD */
+
+.hero-card{
+  background:
+    linear-gradient(145deg,rgba(255,23,68,.13),rgba(255,214,0,.04)),
+    var(--card);
+  border:1px solid rgba(255,23,68,.2);
+  border-radius:24px;
+  padding:30px;
+  box-shadow:0 25px 70px rgba(0,0,0,.4);
+  position:relative;
+  overflow:hidden;
+}
+
+.hero-card:before{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:180px;
+  background:rgba(255,23,68,.12);
+  filter:blur(55px);
+  top:-70px;
+  right:-50px;
+}
+
+.hero-card h2{
+  position:relative;
+  font-size:25px;
+  margin-bottom:10px;
+}
+
+.hero-card .subtitle{
+  position:relative;
+  color:var(--yellow);
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.hero-card p{
+  position:relative;
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:22px;
+}
+
+.card-line{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+
+.card-line:last-child{
+  border-bottom:0;
+}
+
+.check{
+  color:var(--green);
+  font-weight:900;
+}
+
+/* STATS */
+
+.stats{
+  padding:20px 0 65px;
+}
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.stat{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:20px;
+  text-align:center;
+}
+
+.stat strong{
+  display:block;
+  font-size:24px;
+  color:var(--yellow);
+}
+
+.stat span{
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* SECTION */
+
+section{
+  padding:70px 0;
+}
+
+.section-title{
+  text-align:center;
+  margin-bottom:38px;
+}
+
+.section-title h2{
+  font-size:34px;
+  margin-bottom:8px;
+}
+
+.section-title p{
+  color:var(--muted);
+}
+
+/* VIDEO */
+
+.video-box{
+  max-width:900px;
+  margin:auto;
+  aspect-ratio:16/9;
+  background:#000;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+.video-box iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+/* FEATURES */
+
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+
+.feature{
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:25px;
+  border-radius:18px;
+  transition:.25s;
+}
+
+.feature:hover{
+  transform:translateY(-5px);
+  border-color:rgba(255,23,68,.35);
+}
+
+.feature-icon{
+  font-size:28px;
+  margin-bottom:14px;
+}
+
+.feature h3{
+  margin-bottom:8px;
+}
+
+.feature p{
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* PLANS */
+
+.plans-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:14px;
+}
+
+.plan{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:23px 18px;
+  position:relative;
+  transition:.25s;
+}
+
+.plan:hover{
+  transform:translateY(-6px);
+  border-color:rgba(255,23,68,.35);
+}
+
+.plan.premium{
+  border-color:rgba(255,214,0,.4);
+}
+
+.plan-badge{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:var(--yellow);
+  color:#111;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:9px;
+  font-weight:900;
+}
+
+.plan h3{
+  font-size:16px;
+  color:#ddd;
+  margin-bottom:14px;
+}
+
+.price{
+  font-size:34px;
+  font-weight:950;
+  margin-bottom:3px;
+}
+
+.price small{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:normal;
+}
+
+.plan-desc{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:18px;
+  min-height:42px;
+}
+
+.plan ul{
+  list-style:none;
+  margin-bottom:20px;
+}
+
+.plan li{
+  color:#cdd1dc;
+  font-size:12px;
+  margin:8px 0;
+}
+
+.plan li:before{
+  content:"✓";
+  color:var(--green);
+  font-weight:900;
+  margin-right:7px;
+}
+
+.plan button{
+  width:100%;
+  padding:11px;
+  border:0;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--red),#ff3158);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+
+/* ORDER */
+
+.order-box{
+  max-width:700px;
+  margin:auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:30px;
+}
+
+.form-group{
+  margin-bottom:17px;
+}
+
+.form-group label{
+  display:block;
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;
+  background:#0b0d13;
+  color:#fff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px;
+  outline:none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+  border-color:var(--red);
+}
+
+.form-group textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.submit-btn{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--red),#ff3158);
+  color:#fff;
+  font-weight:950;
+  cursor:pointer;
+  font-size:15px;
+}
+
+/* FAQ */
+
+.faq{
+  max-width:800px;
+  margin:auto;
+}
+
+details{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:13px;
+  margin-bottom:10px;
+  padding:17px 20px;
+}
+
+summary{
+  cursor:pointer;
+  font-weight:800;
+}
+
+details p{
+  color:var(--muted);
+  margin-top:12px;
+  font-size:14px;
+}
+
+/* SUPPORT */
+
+.support{
+  text-align:center;
+  background:
+    radial-gradient(circle at center,rgba(255,23,68,.13),transparent 55%);
+}
+
+.support-number{
+  font-size:30px;
+  font-weight:950;
+  margin:15px 0 20px;
+}
+
+.whatsapp{
+  display:inline-block;
+  background:#20df70;
+  color:#07130b;
+  padding:13px 22px;
+  border-radius:11px;
+  font-weight:950;
+}
+
+/* FOOTER */
+
+footer{
+  border-top:1px solid var(--border);
+  padding:30px 0;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+}
+
+footer strong{
+  color:#fff;
+  display:block;
+  margin-bottom:6px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:950px){
+
+  .hero-grid{
+    grid-template-columns:1fr;
+  }
+
+  .plans-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .features-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .stats-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .nav-links{
+    display:none;
+  }
+}
+
+@media(max-width:600px){
+
+  .hero{
+    padding-top:55px;
+  }
+
+  .hero h1{
+    font-size:42px;
+  }
+
+  .plans-grid,
+  .features-grid{
+    grid-template-columns:1fr;
+  }
+
+  .stats-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .order-box{
+    padding:20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+
+    <a href="#" class="logo">
+      FREE FIRE <span>PANEL</span>
+    </a>
+
+    <div class="nav-links">
+      <a href="#video">ভিডিও</a>
+      <a href="#plans">প্ল্যান</a>
+      <a href="#features">ফিচার</a>
+      <a href="#faq">FAQ</a>
+      <a href="#order">অর্ডার</a>
+    </div>
+
+    <a href="#plans" class="nav-btn">
+      প্ল্যান দেখুন
+    </a>
+
+  </div>
+</nav>
+
+
+<!-- HERO -->
+
+<header class="hero">
+
+  <div class="container hero-grid">
+
+    <div>
+
+      <div class="badge">
+        ⚡ FAST DELIVERY • 24/7 SUPPORT
+      </div>
+
+      <h1>
+        আপনার <span>Free Fire Panel</span>
+        Experience আপগ্রেড করুন
+      </h1>
+
+      <p>
+        আপনার পছন্দের Premium Plan বেছে নিন, Order তৈরি করুন
+        এবং পরবর্তী ধাপে আপনার পছন্দের Payment Method ব্যবহার করুন।
+      </p>
+
+      <div class="hero-buttons">
+
+        <a href="#plans" class="btn btn-red">
+          🛒 প্যাকেজ দেখুন
+        </a>
+
+        <a
+          href="https://wa.me/8801311282081"
+          target="_blank"
+          class="btn btn-dark">
+          💬 WhatsApp Support
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <!-- HERO CARD -->
+
+    <div class="hero-card">
+
+      <h2>
+        100% Anti-Ban Panel
+      </h2>
+
+      <div class="subtitle">
+        Main ID Focused • Low-Risk Gaming
+      </div>
+
+      <p>
+        Main ID-তে নিরাপদভাবে খেলার জন্য optimized panel experience.
+      </p>
+
+      <div class="card-line">
+        <span class="check">✓</span>
+        Main ID Focused
+      </div>
+
+      <div class="card-line">
+        <span class="check">✓</span>
+        Low-Risk Gaming
+      </div>
+
+      <div class="card-line">
+        <span class="check">✓</span>
+        Optimized Panel Experience
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- STATS -->
+
+<div class="stats">
+
+  <div class="container stats-grid">
+
+    <div class="stat">
+      <strong>5</strong>
+      <span>Premium Plans</span>
+    </div>
+
+    <div class="stat">
+      <strong>24/7</strong>
+      <span>Support</span>
+    </div>
+
+    <div class="stat">
+      <strong>FAST</strong>
+      <span>Delivery</span>
+    </div>
+
+    <div class="stat">
+      <strong>3</strong>
+      <span>Payment Methods</span>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- VIDEO -->
+
+<section id="video">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <h2>
+        Panel Demo & Details
+      </h2>
+
+      <p>
+        Panel সম্পর্কে বিস্তারিত জানতে ভিডিওটি দেখুন
+      </p>
+
+    </div>
+
+    <div class="video-box">
+
+      <iframe
+        src="https://player.vimeo.com/video/1161419468"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- FEATURES -->
+
+<section id="features">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <h2>
+        Premium Features
+      </h2>
+
+      <p>
+        আপনার জন্য প্রয়োজনীয় গুরুত্বপূর্ণ সুবিধাগুলো
+      </p>
+
+    </div>
+
+
+    <div class="features-grid">
+
+      <div class="feature">
+
+        <div class="feature-icon">⚡</div>
+
+        <h3>
+          Quick Setup
+        </h3>
+
+        <p>
+          সহজ ও দ্রুত setup assistance.
+        </p>
+
+      </div>
+
+
+      <div class="feature">
+
+        <div class="feature-icon">🛡️</div>
+
+        <h3>
+          Account Safety Focus
+        </h3>
+
+        <p>
+          Main ID focused safety optimized experience.
+        </p>
+
+      </div>
+
+
+      <div class="feature">
+
+        <div class="feature-icon">🚀</div>
+
+        <h3>
+          Fast Delivery
+        </h3>
+
+        <p>
+          Order confirm হওয়ার পর দ্রুত delivery process.
+        </p>
+
+      </div>
+
+
+      <div class="feature">
+
+        <div class="feature-icon">💬</div>
+
+        <h3>
+          Customer Support
+        </h3>
+
+        <p>
+          প্রয়োজনে WhatsApp support available.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- PLANS -->
+
+<section id="plans">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <h2>
+        Choose Your Plan
+      </h2>
+
+      <p>
+        আপনার প্রয়োজন অনুযায়ী Premium Plan বেছে নিন
+      </p>
+
+    </div>
+
+
+    <div class="plans-grid">
+
+
+      <!-- PLAN 1 -->
+
+      <div class="plan">
+
+        <h3>
+          1 MONTH
+        </h3>
+
+        <div class="price">
+          ৳99 <small>/ month</small>
+        </div>
+
+        <div class="plan-desc">
+          1-month panel access
+        </div>
+
+        <ul>
+          <li>Setup assistance</li>
+          <li>Customer support</li>
+        </ul>
+
+        <button onclick="selectPlan('1 MONTH - ৳99')">
+          অর্ডার Now
+        </button>
+
+      </div>
+
+
+      <!-- PLAN 2 -->
+
+      <div class="plan premium">
+
+        <div class="plan-badge">
+          PREMIUM
+        </div>
+
+        <h3>
+          1 MONTH PREMIUM
+        </h3>
+
+        <div class="price">
+          ৳199 <small>/ month</small>
+        </div>
+
+        <div class="plan-desc">
+          1-month premium access
+        </div>
+
+        <ul>
+          <li>Priority support</li>
+          <li>Setup assistance</li>
+        </ul>
+
+        <button onclick="selectPlan('1 MONTH PREMIUM - ৳199')">
+          অর্ডার Now
+        </button>
+
+      </div>
+
+
+      <!-- PLAN 3 -->
+
+      <div class="plan">
+
+        <h3>
+          2 MONTH PREMIUM
+        </h3>
+
+        <div class="price">
+          ৳299 <small>/ 2 months</small>
+        </div>
+
+        <div class="plan-desc">
+          2-month premium access
+        </div>
+
+        <ul>
+          <li>Priority support</li>
+          <li>Setup assistance</li>
+        </ul>
+
+        <button onclick="selectPlan('2 MONTH PREMIUM - ৳299')">
+          অর্ডার Now
+        </button>
+
+      </div>
+
+
+      <!-- PLAN 4 -->
+
+      <div class="plan">
+
+        <h3>
+          6 MONTH
+        </h3>
+
+        <div class="price">
+          ৳599 <small>/ 6 months</small>
+        </div>
+
+        <div class="plan-desc">
+          6-month panel access
+        </div>
+
+        <ul>
+          <li>Priority support</li>
+          <li>Setup assistance</li>
+        </ul>
+
+        <button onclick="selectPlan('6 MONTH - ৳599')">
+          অর্ডার Now
+        </button>
+
+      </div>
+
+
+      <!-- PLAN 5 -->
+
+      <div class="plan premium">
+
+        <div class="plan-badge">
+          BEST VALUE
+        </div>
+
+        <h3>
+          LIFETIME PREMIUM
+        </h3>
+
+        <div class="price">
+          ৳999 <small>/ lifetime</small>
+        </div>
+
+        <div class="plan-desc">
+          Lifetime premium access
+        </div>
+
+        <ul>
+          <li>Priority support</li>
+          <li>Setup assistance</li>
+        </ul>
+
+        <button onclick="selectPlan('LIFETIME PREMIUM - ৳999')">
+          অর্ডার Now
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ORDER -->
+
+<section id="order">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <h2>
+        Create Your Order
+      </h2>
+
+      <p>
+        নিচের তথ্যগুলো দিয়ে Order তৈরি করুন
+      </p>
+
+    </div>
+
+
+    <div class="order-box">
+
+      <form id="orderForm">
+
+
+        <div class="form-group">
+
+          <label>
+            Customer Name
+          </label>
+
+          <input
+            type="text"
+            id="customerName"
+            placeholder="আপনার নাম"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            WhatsApp / Phone
+          </label>
+
+          <input
+            type="tel"
+            id="customerPhone"
+            placeholder="01XXXXXXXXX"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="customerEmail"
+            placeholder="example@gmail.com"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Select Package
+          </label>
+
+          <select
+            id="package"
+            required>
+
+            <option value="">
+              Select a package
+            </option>
+
+            <option>
+              1 MONTH - ৳99
+            </option>
+
+            <option>
+              1 MONTH PREMIUM - ৳199
+            </option>
+
+            <option>
+              2 MONTH PREMIUM - ৳299
+            </option>
+
+            <option>
+              6 MONTH - ৳599
+            </option>
+
+            <option>
+              LIFETIME PREMIUM - ৳999
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Additional Note
+          </label>
+
+          <textarea
+            id="note"
+            placeholder="কোনো অতিরিক্ত তথ্য থাকলে লিখুন..."></textarea>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="submit-btn">
+
+          🛒 Create Order
+
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- FAQ -->
+
+<section id="faq">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <h2>
+        Frequently Asked Questions
+      </h2>
+
+      <p>
+        সাধারণ কিছু প্রশ্নের উত্তর
+      </p>
+
+    </div>
+
+
+    <div class="faq">
+
+
+      <details>
+
+        <summary>
+          How do I receive my order?
+        </summary>
+
+        <p>
+          Order তৈরি করার পর payment page-এ payment information
+          দেখতে পারবেন। Payment complete করে support-এর সাথে যোগাযোগ করুন।
+        </p>
+
+      </details>
+
+
+      <details>
+
+        <summary>
+          Which payment methods are available?
+        </summary>
+
+        <p>
+          bKash, Nagad এবং BEP20 payment method available.
+        </p>
+
+      </details>
+
+
+      <details>
+
+        <summary>
+          Can I get setup help?
+        </summary>
+
+        <p>
+          হ্যাঁ, setup assistance এবং customer support available.
+        </p>
+
+      </details>
+
+
+      <details>
+
+        <summary>
+          How can I contact support?
+        </summary>
+
+        <p>
+          WhatsApp-এর মাধ্যমে সরাসরি support-এর সাথে যোগাযোগ করতে পারবেন।
+        </p>
+
+      </details>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- SUPPORT -->
+
+<section class="support">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <h2>
+        Need Help?
+      </h2>
+
+      <p>
+        আমাদের WhatsApp Support-এ যোগাযোগ করুন
+      </p>
+
+    </div>
+
+
+    <div class="support-number">
+      +880 1311-282081
+    </div>
+
+
+    <a
+      href="https://wa.me/8801311282081"
+      target="_blank"
+      class="whatsapp">
+
+      💬 WhatsApp Support
+
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+  <div class="container">
+
+    <strong>
+      FREE FIRE PANEL STORE
+    </strong>
+
+    © 2026 All rights reserved.
+
+    <br>
+
+    Free Fire is a trademark of Garena.
+    This website is not affiliated with Garena.
+
+  </div>
+
+</footer>
+
+
+<script>
+
+/* ==========================================
+   SELECT PLAN
+========================================== */
+
+function selectPlan(plan){
+
+  document.getElementById("package").value = plan;
+
+  document.getElementById("order").scrollIntoView({
+    behavior:"smooth"
+  });
+
+}
+
+
+/* ==========================================
+   CREATE ORDER
+========================================== */
+
+document
+.getElementById("orderForm")
+.addEventListener("submit", function(e){
+
+  e.preventDefault();
+
+
+  const name =
+    document
+      .getElementById("customerName")
+      .value
+      .trim();
+
+
+  const phone =
+    document
+      .getElementById("customerPhone")
+      .value
+      .trim();
+
+
+  const email =
+    document
+      .getElementById("customerEmail")
+      .value
+      .trim();
+
+
+  const packageName =
+    document
+      .getElementById("package")
+      .value;
+
+
+  const note =
+    document
+      .getElementById("note")
+      .value
+      .trim();
+
+
+  /* VALIDATION */
+
+  if(
+    !name ||
+    !phone ||
+    !email ||
+    !packageName
+  ){
+
+    alert(
+      "Please fill in all required fields."
+    );
+
+    return;
+  }
+
+
+  /* CREATE UNIQUE ORDER ID */
+
+  const orderId =
+    "FF-" +
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    ) +
+    "-" +
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    );
+
+
+  /* ORDER OBJECT */
+
+  const order = {
+
+    orderId: orderId,
+
+    customerName: name,
+
+    phone: phone,
+
+    email: email,
+
+    package: packageName,
+
+    note: note,
+
+    createdAt:
+      new Date().toISOString()
+
+  };
+
+
+  /* SAVE ORDER */
+
+  localStorage.setItem(
+    "ff_current_order",
+    JSON.stringify(order)
+  );
+
+
+  /* GO TO PAYMENT PAGE */
+
+  window.location.href =
+    "payment.html?order=" +
+    encodeURIComponent(orderId);
+
+});
+
+</script>
+
+</body>
+</html>
