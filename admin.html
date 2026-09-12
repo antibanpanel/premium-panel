@@ -489,7 +489,7 @@ td{
 <body>
 
 <!-- =====================================================
-     SUPABASE AUTH LOGIN
+     LOGIN
 ===================================================== -->
 
 <section id="loginScreen">
@@ -544,7 +544,7 @@ td{
 </section>
 
 <!-- =====================================================
-     ADMIN DASHBOARD
+     ADMIN PANEL
 ===================================================== -->
 
 <section
@@ -640,7 +640,7 @@ td{
 </div>
 
 
-<!-- ORDER TABLE -->
+<!-- TABLE -->
 
 <div class="table-card">
 
@@ -686,7 +686,7 @@ td{
 </section>
 
 <!-- =====================================================
-     ORDER DETAILS MODAL
+     MODAL
 ===================================================== -->
 
 <div
@@ -709,7 +709,6 @@ td{
   </button>
 
 </div>
-
 
 <div class="detail">
   <small>Order ID</small>
@@ -761,7 +760,6 @@ td{
   <strong id="mStatus">-</strong>
 </div>
 
-
 <div class="modal-actions">
 
   <button
@@ -783,12 +781,15 @@ td{
 
 </div>
 
-<div id="toast" class="toast"></div>
+<div
+  id="toast"
+  class="toast">
+</div>
 
 <script>
 
 /* =====================================================
-   SUPABASE
+   SUPABASE CONFIG
 ===================================================== */
 
 const SUPABASE_URL =
@@ -805,7 +806,15 @@ const supabaseClient =
 
 
 /* =====================================================
-   AUTOMATIC PANEL DOWNLOAD URL
+   ONLY THIS SUPABASE AUTH USER IS ADMIN
+===================================================== */
+
+const ADMIN_USER_ID =
+  "17d06be6-8c42-477a-987f-d35c7eb9411a";
+
+
+/* =====================================================
+   AUTOMATIC ZIP DOWNLOAD
 ===================================================== */
 
 const DOWNLOAD_URL =
@@ -817,7 +826,6 @@ const DOWNLOAD_URL =
 ===================================================== */
 
 let allOrders = [];
-
 let selectedOrder = null;
 
 
@@ -875,7 +883,7 @@ const modalReject =
 
 
 /* =====================================================
-   SHOW ERROR
+   LOGIN ERROR
 ===================================================== */
 
 function showLoginError(text){
@@ -890,7 +898,7 @@ function showLoginError(text){
 
 
 /* =====================================================
-   LOGIN WITH SUPABASE AUTH
+   LOGIN
 ===================================================== */
 
 loginBtn.addEventListener(
@@ -899,7 +907,7 @@ loginBtn.addEventListener(
 );
 
 
-passwordInput.addEventListener(
+emailInput.addEventListener(
   "keydown",
   function(e){
 
@@ -911,7 +919,7 @@ passwordInput.addEventListener(
 );
 
 
-emailInput.addEventListener(
+passwordInput.addEventListener(
   "keydown",
   function(e){
 
@@ -939,7 +947,6 @@ async function login(){
     );
 
     return;
-
   }
 
 
@@ -950,7 +957,6 @@ async function login(){
     );
 
     return;
-
   }
 
 
@@ -967,22 +973,23 @@ async function login(){
   const {
     data,
     error
-  } = await supabaseClient.auth
-    .signInWithPassword({
+  } =
+    await supabaseClient.auth
+      .signInWithPassword({
 
-      email:
-        email,
+        email:
+          email,
 
-      password:
-        password
+        password:
+          password
 
-    });
+      });
 
 
   if(error){
 
     console.error(
-      "Login Error:",
+      "Supabase Auth Error:",
       error
     );
 
@@ -998,11 +1005,13 @@ async function login(){
       "Login";
 
     return;
-
   }
 
 
-  if(!data.session){
+  if(
+    !data.session ||
+    !data.user
+  ){
 
     showLoginError(
       "Login session পাওয়া যায়নি।"
@@ -1015,7 +1024,32 @@ async function login(){
       "Login";
 
     return;
+  }
 
+
+  /*
+    UID SECURITY CHECK
+  */
+
+  if(
+    data.user.id !==
+    ADMIN_USER_ID
+  ){
+
+    await supabaseClient.auth
+      .signOut();
+
+    showLoginError(
+      "This account is not authorized as admin."
+    );
+
+    loginBtn.disabled =
+      false;
+
+    loginBtn.textContent =
+      "Login";
+
+    return;
   }
 
 
@@ -1032,6 +1066,17 @@ async function login(){
 
 function showDashboard(session){
 
+  if(
+    !session ||
+    !session.user ||
+    session.user.id !==
+    ADMIN_USER_ID
+  ){
+
+    return;
+  }
+
+
   loginScreen.classList.add(
     "hidden"
   );
@@ -1041,18 +1086,133 @@ function showDashboard(session){
   );
 
 
-  if(session &&
-     session.user){
-
-    userEmail.textContent =
-      session.user.email || "";
-
-  }
+  userEmail.textContent =
+    session.user.email || "";
 
 
   loadOrders();
 
 }
+
+
+/* =====================================================
+   CHECK CURRENT SESSION
+===================================================== */
+
+async function checkSession(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth
+      .getSession();
+
+
+  if(error){
+
+    console.error(
+      "Session Error:",
+      error
+    );
+
+    return;
+  }
+
+
+  const session =
+    data.session;
+
+
+  if(
+    session &&
+    session.user
+  ){
+
+    /*
+      Check UID before dashboard
+    */
+
+    if(
+      session.user.id ===
+      ADMIN_USER_ID
+    ){
+
+      showDashboard(
+        session
+      );
+
+    }else{
+
+      await supabaseClient.auth
+        .signOut();
+
+    }
+
+  }
+
+}
+
+
+checkSession();
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+supabaseClient.auth
+  .onAuthStateChange(
+    async function(
+      event,
+      session
+    ){
+
+      if(
+        event === "SIGNED_IN" &&
+        session &&
+        session.user
+      ){
+
+        if(
+          session.user.id ===
+          ADMIN_USER_ID
+        ){
+
+          showDashboard(
+            session
+          );
+
+        }else{
+
+          await supabaseClient.auth
+            .signOut();
+
+          showLoginError(
+            "This account is not authorized as admin."
+          );
+
+        }
+
+      }
+
+
+      if(
+        event === "SIGNED_OUT"
+      ){
+
+        adminPanel.classList.add(
+          "hidden"
+        );
+
+        loginScreen.classList.remove(
+          "hidden"
+        );
+
+      }
+
+    }
+  );
 
 
 /* =====================================================
@@ -1063,22 +1223,14 @@ logoutBtn.addEventListener(
   "click",
   async function(){
 
-    await supabaseClient.auth.signOut();
+    await supabaseClient.auth
+      .signOut();
 
     allOrders = [];
 
     selectedOrder = null;
 
-    adminPanel.classList.add(
-      "hidden"
-    );
-
-    loginScreen.classList.remove(
-      "hidden"
-    );
-
     emailInput.value = "";
-
     passwordInput.value = "";
 
     loginBtn.disabled =
@@ -1092,83 +1244,6 @@ logoutBtn.addEventListener(
 
 
 /* =====================================================
-   CHECK EXISTING SESSION
-===================================================== */
-
-async function checkSession(){
-
-  const {
-    data
-  } = await supabaseClient.auth
-    .getSession();
-
-
-  if(
-    data &&
-    data.session
-  ){
-
-    showDashboard(
-      data.session
-    );
-
-  }else{
-
-    loginScreen.classList.remove(
-      "hidden"
-    );
-
-    adminPanel.classList.add(
-      "hidden"
-    );
-
-  }
-
-}
-
-
-checkSession();
-
-
-/* =====================================================
-   AUTH STATE LISTENER
-===================================================== */
-
-supabaseClient.auth
-  .onAuthStateChange(
-    function(event, session){
-
-      if(
-        event === "SIGNED_IN" &&
-        session
-      ){
-
-        showDashboard(
-          session
-        );
-
-      }
-
-
-      if(
-        event === "SIGNED_OUT"
-      ){
-
-        loginScreen.classList.remove(
-          "hidden"
-        );
-
-        adminPanel.classList.add(
-          "hidden"
-        );
-
-      }
-
-    }
-  );
-
-
-/* =====================================================
    LOAD ORDERS
 ===================================================== */
 
@@ -1177,21 +1252,22 @@ async function loadOrders(){
   const {
     data,
     error
-  } = await supabaseClient
-    .from("orders")
-    .select("*")
-    .order(
-      "created_at",
-      {
-        ascending:false
-      }
-    );
+  } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
 
 
   if(error){
 
     console.error(
-      "Orders Error:",
+      "Orders Load Error:",
       error
     );
 
@@ -1202,7 +1278,6 @@ async function loadOrders(){
     );
 
     return;
-
   }
 
 
@@ -1210,7 +1285,6 @@ async function loadOrders(){
     data || [];
 
   updateStats();
-
   renderOrders();
 
 }
@@ -1225,6 +1299,7 @@ function updateStats(){
   const total =
     allOrders.length;
 
+
   const pending =
     allOrders.filter(
       o =>
@@ -1234,6 +1309,7 @@ function updateStats(){
         === "pending"
     ).length;
 
+
   const approved =
     allOrders.filter(
       o =>
@@ -1242,6 +1318,7 @@ function updateStats(){
         ).toLowerCase()
         === "approved"
     ).length;
+
 
   const rejected =
     allOrders.filter(
@@ -1258,15 +1335,18 @@ function updateStats(){
   ).textContent =
     total;
 
+
   document.getElementById(
     "pendingCount"
   ).textContent =
     pending;
 
+
   document.getElementById(
     "approvedCount"
   ).textContent =
     approved;
+
 
   document.getElementById(
     "rejectedCount"
@@ -1286,6 +1366,7 @@ function renderOrders(){
     searchInput.value
       .trim()
       .toLowerCase();
+
 
   const filter =
     statusFilter.value;
@@ -1348,7 +1429,6 @@ function renderOrders(){
       "block";
 
     return;
-
   }
 
 
@@ -1603,7 +1683,7 @@ function closeModalWindow(){
 
 
 /* =====================================================
-   APPROVE
+   APPROVE ORDER
 ===================================================== */
 
 async function approveOrder(
@@ -1628,7 +1708,7 @@ async function approveOrder(
       "Order ID: " +
       orderId +
       "\n\n" +
-      "Customer will automatically receive the panel download."
+      "Customer will automatically receive the panel ZIP."
     );
 
 
@@ -1638,34 +1718,34 @@ async function approveOrder(
 
 
   /*
-    IMPORTANT:
-    No URL input.
-    GitHub ZIP URL automatically saved.
+    AUTOMATIC ZIP LINK
+    No manual URL input.
   */
 
   const {
     error
-  } = await supabaseClient
-    .from("orders")
-    .update({
+  } =
+    await supabaseClient
+      .from("orders")
+      .update({
 
-      status:
-        "approved",
+        status:
+          "approved",
 
-      download_url:
-        DOWNLOAD_URL,
+        download_url:
+          DOWNLOAD_URL,
 
-      approved_at:
-        new Date().toISOString(),
+        approved_at:
+          new Date().toISOString(),
 
-      rejected_at:
-        null
+        rejected_at:
+          null
 
-    })
-    .eq(
-      "order_id",
-      orderId
-    );
+      })
+      .eq(
+        "order_id",
+        orderId
+      );
 
 
   if(error){
@@ -1682,7 +1762,6 @@ async function approveOrder(
     );
 
     return;
-
   }
 
 
@@ -1700,7 +1779,7 @@ async function approveOrder(
 
 
 /* =====================================================
-   REJECT
+   REJECT ORDER
 ===================================================== */
 
 async function rejectOrder(
@@ -1722,24 +1801,25 @@ async function rejectOrder(
 
   const {
     error
-  } = await supabaseClient
-    .from("orders")
-    .update({
+  } =
+    await supabaseClient
+      .from("orders")
+      .update({
 
-      status:
-        "rejected",
+        status:
+          "rejected",
 
-      rejected_at:
-        new Date().toISOString(),
+        rejected_at:
+          new Date().toISOString(),
 
-      download_url:
-        null
+        download_url:
+          null
 
-    })
-    .eq(
-      "order_id",
-      orderId
-    );
+      })
+      .eq(
+        "order_id",
+        orderId
+      );
 
 
   if(error){
@@ -1756,7 +1836,6 @@ async function rejectOrder(
     );
 
     return;
-
   }
 
 
@@ -1816,7 +1895,7 @@ modalReject.addEventListener(
 
 
 /* =====================================================
-   SEARCH
+   SEARCH / FILTER
 ===================================================== */
 
 searchInput.addEventListener(
@@ -1832,7 +1911,7 @@ statusFilter.addEventListener(
 
 
 /* =====================================================
-   AUTO REFRESH ORDERS
+   AUTO REFRESH EVERY 10 SEC
 ===================================================== */
 
 setInterval(
@@ -1871,9 +1950,11 @@ function showToast(
   toast.textContent =
     text;
 
+
   toast.className =
     "toast " +
     (type || "");
+
 
   toast.style.display =
     "block";
